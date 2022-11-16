@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import DatePicker from "react-datepicker";
 import {ko} from "date-fns/esm/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import REST_JSON from "../assets/json/rest-data.json";
 import ONLY_REST_JSON from "../assets/json/only-rest-date.json";
-import {changeDate, dateChangeDate, insertAtInString} from "../utils/changeDate";
+import {dateChangeDate, insertAtInString} from "../utils/changeDate";
 import {RestDataType} from "./Calendar";
 import {format} from "../utils/DateUtil";
 
@@ -148,7 +148,7 @@ const AddPage = () => {
                         const json: RestDataType = REST_JSON[year.toString() as keyof typeof REST_JSON];
                         return (typeof json[today] === 'string') ? "random" : "";
                       }}
-                      selectsRange
+                      selectsRange={true}
                       onMonthChange={setStartDate}
                       inline
                       filterDate={isWeekday}
