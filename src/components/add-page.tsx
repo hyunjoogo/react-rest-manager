@@ -6,13 +6,19 @@ import REST_JSON from "../assets/json/rest-data.json";
 import ONLY_REST_JSON from "../assets/json/only-rest-date.json";
 import {changeDate, dateChangeDate, insertAtInString} from "../utils/changeDate";
 import {RestDataType} from "./Calendar";
+import {format} from "../utils/DateUtil";
+
 
 interface FormDate {
   category: string,
   useType: string,
+  startDt: string,
+  endDt: string,
+  publicReason : string,
+  privateReason : string
 }
 
-type DateType = Date | null
+export type DateType = Date | null
 
 
 // 1. 휴가 사용유형이 오전반차, 오후반차일 경우
@@ -27,6 +33,10 @@ const AddPage = () => {
   const [formData, setFormData] = useState<FormDate>({
     category: "",
     useType: "",
+    startDt : "",
+    endDt : "",
+    publicReason : "",
+    privateReason : ""
   });
   const [startDate, setStartDate] = useState<DateType>(new Date());
   const [endDate, setEndDate] = useState<DateType>(null);
@@ -36,22 +46,24 @@ const AddPage = () => {
   }, []);
 
 
-  const handleCategory = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData(prev => ({...prev, category: e.target.value}));
-  }, []);
+  const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const target = e.target;
+    const name = target.name;
+    setFormData(prev => ({...prev, [name]: target.value}));
+  }
 
-  const handleUseType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(formData.category);
-
-    setFormData(prev => ({...prev, useType: e.target.value}));
-  }, [formData.category]);
+  const handleTextareaValue = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target;
+    const name = target.name;
+    setFormData(prev => ({...prev, [name]: target.value}));
+  }
 
   const onChange = (dates: [(DateType), (DateType)]) => {
-    console.log(dates);
     const [start, end] = dates;
     // end가 null 일 경우 하루 선택
     setStartDate(start);
     setEndDate(end);
+    setFormData(prev => ({...prev , startDt : format(start), endDt : format(end)}));
   };
 
 
@@ -66,14 +78,15 @@ const AddPage = () => {
   };
 
 
-  const onSubmit = () => {
-    console.log();
+  const onSubmit = (e : React.FormEvent) => {
+    e.preventDefault()
+    console.log(formData);
   };
   return (
     <>
       <div className="md:grid md:grid-cols-3 md:gap-6">
         <div className="mt-5 md:col-span-2 md:mt-0">
-          <form action="#" method="POST">
+          <form onSubmit={onSubmit}>
             <div className="overflow-hidden shadow sm:rounded-md">
               <div className="bg-white px-4 py-5 sm:p-6">
                 {/* 휴가 유형 */}
@@ -85,7 +98,7 @@ const AddPage = () => {
                     <select
                       id="rest-category"
                       name="rest-category"
-                      onChange={handleCategory}
+                      onChange={handleSelectMenuValue}
                       value={formData.category}
                       className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     >
@@ -105,7 +118,7 @@ const AddPage = () => {
                     <select
                       id="rest-useType"
                       name="rest-useType"
-                      onChange={handleUseType}
+                      onChange={handleSelectMenuValue}
                       value={formData.useType}
                       className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     >
@@ -142,25 +155,21 @@ const AddPage = () => {
                       className=""
                     />
                   </div>
-                  {/*<input*/}
-                  {/*  type="date"*/}
-                  {/*  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"*/}
-                  {/*/>*/}
-
                 </div>
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="publicReason" className="block text-sm font-medium text-gray-700">
                       휴가 사유
                     </label>
                     <div className="mt-1">
                       <textarea
-                        id="about"
-                        name="about"
+                        id="publicReason"
+                        name="publicReason"
                         rows={3}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="공개되는 휴가 사유를 적으세요."
-                        defaultValue={''}
+                        value={formData.publicReason}
+                        onChange={handleTextareaValue}
                       />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
@@ -170,17 +179,18 @@ const AddPage = () => {
                 </div>
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="privateReason" className="block text-sm font-medium text-gray-700">
                       개인 메모 (비공개)
                     </label>
                     <div className="mt-1">
                       <textarea
-                        id="about"
-                        name="about"
+                        id="privateReason"
+                        name="privateReason"
                         rows={3}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="이 메모는 비공개입니다. "
-                        defaultValue={''}
+                        value={formData.privateReason}
+                        onChange={handleTextareaValue}
                       />
                     </div>
                     <p className="mt-2 text-sm text-gray-500 ">
