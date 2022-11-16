@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {changeDate} from "../utils/changeDate";
 import REST_JSON from '../assets/json/rest-data.json';
 
@@ -88,7 +88,8 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
         dateNum: i,
         fullDate: changeDate(today.year, today.month, i),
       };
-      if (typeof json[date] === 'string') {
+
+      if (json && typeof json[date] === 'string') {
         temp["daysName"] = json[date];
       }
       tempList.push(temp);
@@ -104,21 +105,32 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
     setCalendarList(tempList);
   }, [wantDay]);
 
-  const handleMonth = () => {
+  const handleMonth = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const button: HTMLButtonElement = e.currentTarget;
     setToday(prevState => {
       const year = prevState.getFullYear();
-      const nextMonth = prevState.getMonth() + 1;
+      const targetMonth = button.name === "next" ? prevState.getMonth() + 1 : prevState.getMonth() - 1;
       const date = prevState.getDate();
-      return new Date(year, nextMonth, date)
+      return new Date(year, targetMonth, date);
     });
   };
 
   return (
     <>
       <div className="calendar__nav">
-        <button className="prev" onClick={handleMonth}>﹤</button>
-        <p className="this__month"></p>
-        <button className="next" onClick={handleMonth}>﹥</button>
+        <button
+          className="prev"
+          name="prev"
+          onClick={handleMonth}
+        >﹤
+        </button>
+        <p className="this__month">{wantDay.getFullYear()}-{wantDay.getMonth() + 1}</p>
+        <button
+          className="next"
+          name="next"
+          onClick={handleMonth}
+        >﹥
+        </button>
       </div>
       <section className="calendar__body"></section>
       <table className="calendar">
