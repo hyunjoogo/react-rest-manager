@@ -2,9 +2,26 @@
     width: 100%;
     border-top: 1px solid #444444;
     border-collapse: collapse;
+
 }
 
 th, td {
-    border-bottom: 1px solid #444444;
-    padding: 10px;
+    border: 1px solid #444444;
+    padding: 0.5rem;
+}
+
+.calendar-wrapper .calendar__nav {
+    @apply flex justify-between
+}
+
+.days_title {
+    /*@apply*/
+}
+.days-name {
+    @apply text-xs;
+}
+
+
+.react-datepicker .random {
+    color: red;
 }

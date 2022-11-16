@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
 
-    "checkJs": true,
+    "checkJs": false,
     "removeComments": true,
     "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true,

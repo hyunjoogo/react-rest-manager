@@ -1,12 +1,19 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import DatePicker from "react-datepicker";
-
+import {ko} from "date-fns/esm/locale";
 import "react-datepicker/dist/react-datepicker.css";
+import REST_JSON from "../assets/json/rest-data.json";
+import ONLY_REST_JSON from "../assets/json/only-rest-date.json";
+import {changeDate, dateChangeDate, insertAtInString} from "../utils/changeDate";
+import {RestDataType} from "./Calendar";
 
 interface FormDate {
   category: string,
   useType: string,
 }
+
+type DateType = Date | null
+
 
 // 1. 휴가 사용유형이 오전반차, 오후반차일 경우
 // => 날짜 선택 => 하루만 선택
@@ -21,8 +28,13 @@ const AddPage = () => {
     category: "",
     useType: "",
   });
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState<DateType>(new Date());
+  const [endDate, setEndDate] = useState<DateType>(null);
+
+  useEffect(() => {
+
+  }, []);
+
 
   const handleCategory = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData(prev => ({...prev, category: e.target.value}));
@@ -34,20 +46,28 @@ const AddPage = () => {
     setFormData(prev => ({...prev, useType: e.target.value}));
   }, [formData.category]);
 
-  const onChange = (dates: Date | null ) => {
+  const onChange = (dates: [(DateType), (DateType)]) => {
     console.log(dates);
-    // const [start, end] = dates;
-    // setStartDate(start);
-    // setEndDate(end);
+    const [start, end] = dates;
+    // end가 null 일 경우 하루 선택
+    setStartDate(start);
+    setEndDate(end);
   };
 
-  const isWeekday = (date:Date) => {
+
+  // TODO 주말도 선택되는 이슈있음
+  const isWeekday = (date: Date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
   };
+  const excludeDate = () => {
+    const array: Date[] = ONLY_REST_JSON.restDayList.map(value => new Date(insertAtInString(value)));
+    return array;
+  };
+
 
   const onSubmit = () => {
-
+    console.log();
   };
   return (
     <>
@@ -97,38 +117,36 @@ const AddPage = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-6 gap-6">
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => console.log(date)}
-                    startDate={startDate}
-                    endDate={endDate}
-                    // excludeDates={[addDays(new Date(), 1), addDays(new Date(), 5)]}
-                    selectsRange
-                    // selectsDisabledDaysInRange
-                    inline
-                    filterDate={isWeekday}
-                  />
+                  <div className="col-span-6 sm:col-span-3">
+                    <label htmlFor="datePicker" className="block text-sm font-medium text-gray-700">
+                      날짜 선택
+                    </label>
+                    <DatePicker
+                      locale={ko}
+                      name="datePicker"
+                      selected={startDate}
+                      onChange={(date) => onChange(date)}
+                      startDate={startDate}
+                      endDate={endDate}
+                      excludeDates={excludeDate()} // 자신의 휴가일 빼는 것도 좋을듯
+                      dayClassName={(date) => {
+                        const today = dateChangeDate(date);
+                        const year = date.getFullYear();
+                        const json: RestDataType = REST_JSON[year.toString() as keyof typeof REST_JSON];
+                        return (typeof json[today] === 'string') ? "random" : "";
+                      }}
+                      selectsRange
+                      onMonthChange={setStartDate}
+                      inline
+                      filterDate={isWeekday}
+                      className=""
+                    />
+                  </div>
+                  {/*<input*/}
+                  {/*  type="date"*/}
+                  {/*  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"*/}
+                  {/*/>*/}
 
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                      휴가 시작날짜
-                    </label>
-                    <input
-                      name="startDate"
-                      type="date"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    />
-                  </div>
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                      휴가 종료날짜
-                    </label>
-                    <input
-                      name="endDate"
-                      type="date"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    />
-                  </div>
                 </div>
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">

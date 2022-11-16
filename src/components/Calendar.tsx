@@ -13,7 +13,7 @@ type CalendarList = {
   daysName?: string,
 }
 
-type Item = {
+export type RestDataType = {
   [key: string]: string;
 }
 
@@ -81,7 +81,7 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
     for (let i = 1; i < thisMonthLast.date + 1; i++) {
       // 이번달 내용 표시하기
       const year = today.year.toString() as string;
-      const json: Item = REST_JSON[year as keyof typeof REST_JSON];
+      const json: RestDataType = REST_JSON[year as keyof typeof REST_JSON];
       const date = changeDate(today.year, today.month, i) as string;
 
       let temp: CalendarList = {
@@ -116,7 +116,7 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
   };
 
   return (
-    <>
+    <div className="calendar-wrapper bg-gray-50 px-4 py-3 text-left sm:px-6 text-sm">
       <div className="calendar__nav">
         <button
           className="prev"
@@ -156,9 +156,11 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
                   return (
                     <td className={value.fullDate} key={index + count}>
                       <div className="days_wrapper">
-                        <div className="days_title">
+                        <div className="days_title flex">
                           <p className="days">{temp?.dateNum}</p>
-                          <p className="days-name">{temp?.daysName}</p>
+                          <p className="days-name">
+                            {temp?.daysName}
+                          </p>
                         </div>
                         <div className="days_content_wrapper">
                           <div className="days_content"></div>
@@ -176,7 +178,7 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
 
         </tbody>
       </table>
-    </>
+    </div>
   )
     ;
 };
