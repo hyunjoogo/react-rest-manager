@@ -7,6 +7,7 @@ import ONLY_REST_JSON from "../assets/json/only-rest-date.json";
 import {dateChangeDate, insertAtInString} from "../utils/changeDate";
 import {RestDataType} from "./Calendar";
 import {format} from "../utils/DateUtil";
+import MiniCalendar from "./mini-calendar";
 
 
 interface FormDate {
@@ -14,8 +15,8 @@ interface FormDate {
   useType: string,
   startDt: string,
   endDt: string,
-  publicReason : string,
-  privateReason : string
+  publicReason: string,
+  privateReason: string
 }
 
 export type DateType = Date | null
@@ -33,13 +34,12 @@ const AddPage = () => {
   const [formData, setFormData] = useState<FormDate>({
     category: "",
     useType: "",
-    startDt : "",
-    endDt : "",
-    publicReason : "",
-    privateReason : ""
+    startDt: "",
+    endDt: "",
+    publicReason: "",
+    privateReason: ""
   });
-  const [startDate, setStartDate] = useState<DateType>(new Date());
-  const [endDate, setEndDate] = useState<DateType>(null);
+
 
   useEffect(() => {
 
@@ -49,37 +49,22 @@ const AddPage = () => {
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
     const name = target.name;
-    setFormData(prev => ({...prev, [name]: target.value}));
-  }
+    if (name === "category") {
+      setFormData(prev => ({...prev, [name]: target.value, useType: ""}));
+    } else {
+      setFormData(prev => ({...prev, [name]: target.value}));
+    }
+  };
 
   const handleTextareaValue = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const target = e.target;
     const name = target.name;
     setFormData(prev => ({...prev, [name]: target.value}));
-  }
-
-  const onChange = (dates: [(DateType), (DateType)]) => {
-    const [start, end] = dates;
-    // end가 null 일 경우 하루 선택
-    setStartDate(start);
-    setEndDate(end);
-    setFormData(prev => ({...prev , startDt : format(start), endDt : format(end)}));
   };
 
 
-  // TODO 주말도 선택되는 이슈있음
-  const isWeekday = (date: Date) => {
-    const day = date.getDay();
-    return day !== 0 && day !== 6;
-  };
-  const excludeDate = () => {
-    const array: Date[] = ONLY_REST_JSON.restDayList.map(value => new Date(insertAtInString(value)));
-    return array;
-  };
-
-
-  const onSubmit = (e : React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     console.log(formData);
   };
   return (
@@ -92,12 +77,12 @@ const AddPage = () => {
                 {/* 휴가 유형 */}
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="rest-category" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                       휴가 유형 *
                     </label>
                     <select
-                      id="rest-category"
-                      name="rest-category"
+                      id="category"
+                      name="category"
                       onChange={handleSelectMenuValue}
                       value={formData.category}
                       className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
@@ -112,13 +97,14 @@ const AddPage = () => {
                 {/* 휴가 사용 유형 */}
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="rest-useType" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="useType" className="block text-sm font-medium text-gray-700">
                       휴가 사용 유형
                     </label>
                     <select
-                      id="rest-useType"
-                      name="rest-useType"
+                      id="useType"
+                      name="useType"
                       onChange={handleSelectMenuValue}
+                      disabled={formData.category === ""}
                       value={formData.useType}
                       className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     >
@@ -134,26 +120,8 @@ const AddPage = () => {
                     <label htmlFor="datePicker" className="block text-sm font-medium text-gray-700">
                       날짜 선택
                     </label>
-                    <DatePicker
-                      locale={ko}
-                      name="datePicker"
-                      selected={startDate}
-                      onChange={(date) => onChange(date)}
-                      startDate={startDate}
-                      endDate={endDate}
-                      excludeDates={excludeDate()} // 자신의 휴가일 빼는 것도 좋을듯
-                      dayClassName={(date) => {
-                        const today = dateChangeDate(date);
-                        const year = date.getFullYear();
-                        const json: RestDataType = REST_JSON[year.toString() as keyof typeof REST_JSON];
-                        return (typeof json[today] === 'string') ? "random" : "";
-                      }}
-                      selectsRange={true}
-                      onMonthChange={setStartDate}
-                      inline
-                      filterDate={isWeekday}
-                      className=""
-                    />
+                    <DatePicker onChange={console.log}></DatePicker>
+                    <MiniCalendar/>
                   </div>
                 </div>
                 <div className="grid grid-cols-6 gap-6">

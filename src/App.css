@@ -2,12 +2,17 @@
     width: 100%;
     border-top: 1px solid #444444;
     border-collapse: collapse;
-
 }
 
-th, td {
-    border: 1px solid #444444;
+td {
+    border: 1px solid #E5EAEE;
     padding: 0.5rem;
+}
+
+th {
+    border: none;
+    padding: 0.5rem;
+    color: #B7B8BC;
 }
 
 .calendar-wrapper .calendar__nav {
@@ -17,11 +22,56 @@ th, td {
 .days_title {
     /*@apply*/
 }
+
+
 .days-name {
     @apply text-xs;
 }
 
 
-.react-datepicker .random {
-    color: red;
+.mini-calendar .calendar__container {
+    cursor: default;
+    @apply w-full text-center
 }
+
+.mini-calendar .calendar__navi {
+    border: 1px solid #E5EAEE;
+    @apply flex justify-between
+}
+
+.mini-calendar .calendar__container {
+    cursor: default;
+    @apply w-full
+}
+
+.mini-calendar .calendar__container thead {
+    border-left: 1px solid #E5EAEE;
+    border-right: 1px solid #E5EAEE;
+}
+
+.mini-calendar .calendar__container .holiday {
+    color: red;
+    cursor: not-allowed;
+}
+.mini-calendar .calendar__container .sat.holiday {
+    color: inherit;
+}
+
+.mini-calendar .calendar__container .notCurrent {
+    color: gray;
+    opacity: 0.5;
+}
+.mini-calendar .calendar__container .sat.holiday.notCurrent {
+    color: gray;
+    opacity: 0.5;
+}
+
+.mini-calendar .calendar__container .today {
+    background-color: #EBF4FD;
+}
+
+.mini-calendar .calendar__container .selected {
+    background-color: #0D5CE0;
+    color: white;
+}
+

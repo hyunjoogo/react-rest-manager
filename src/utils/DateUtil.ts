@@ -3,19 +3,15 @@ import {DateType} from "../components/add-page";
 
 interface DateFormat {
   (value?: Date | DateType | null, format?: string): string;
-
 }
 
 export const Format = {
   YYYY_MM_DD: 'YYYY-MM-DD',
   YY_MM_DD: 'YY-MM-DD',
   YYYY_MM_DD_HHmmss: 'YYYY-MM-DD HH:mm:ss',
-  YYYY_MM_DD_HHmmss_SSS: 'YYYY-MM-DD HH:mm:ss.SSS ',
   YYYY_MM_DD_HHmm: 'YYYY-MM-DD HH:mm',
   YYYY_MM: 'YYYY-MM',
-  YYYYMM: 'YYYYMM',
-  HH_mm_ss: 'HH:mm:ss',
-  LT: 'LT'
+  YYYYMMDD: "YYYYMMDD"
 };
 
 /**
@@ -25,12 +21,45 @@ export const Format = {
 
 
 
-export const format: DateFormat = (value, format = Format.YYYY_MM_DD) => {
+export const format: DateFormat = (value, format = Format.YYYYMMDD) => {
   if (value === null) {
     return "";
   }
   return moment(value).format(format);
 };
+
+export function whatDay(value: Date | string | undefined) {
+  return moment(value).day();
+}
+
+export function prevMonth(value: Date | undefined) {
+  return moment(value).subtract(1, 'months').toDate();
+}
+
+export function nextMonth(value: Date | undefined) {
+  return moment(value).add(1, 'months').toDate();
+}
+
+export function toStartOfMonth(value: Date | undefined) {
+  return moment(value).startOf('month').toDate();
+}
+
+export function toEndOfMonth(value: Date | undefined) {
+  return moment(value).endOf('month').toDate();
+}
+
+export function toEndOfPrevMonth(value: Date | undefined) {
+  return moment(value).subtract(1, 'months').endOf('month').toDate();
+}
+
+export function toStartOfNextMonth(value: Date | undefined) {
+  return moment(value).add(1, 'months').startOf('month').toDate();
+}
+
+
+export function toEndOfTime(value: Date | undefined) {
+  return moment(value).endOf('day').toDate();
+}
 
 export function toTimeStamp(value: Date | undefined) {
   return moment(value).toDate().getTime();
@@ -38,18 +67,6 @@ export function toTimeStamp(value: Date | undefined) {
 
 export function toStartOfTimeStamp(value: Date | undefined) {
   return moment(value).startOf('day').toDate().getTime();
-}
-
-export function toEndOfTimeStamp(value: Date | undefined) {
-  return moment(value).endOf('day').toDate().getTime();
-}
-
-export function toStartOfMonthTimeStamp(value: Date | undefined) {
-  return moment(value).startOf('month').toDate().getTime();
-}
-
-export function toEndOfMonthTimeStamp(value: Date | undefined) {
-  return moment(value).endOf('month').toDate().getTime();
 }
 
 export function toStartOfYearTimeStamp(value: Date | undefined) {
