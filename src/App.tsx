@@ -1,28 +1,21 @@
 import './App.css';
-import Calendar from './components/Calendar';
-import {useCallback, useState} from "react";
-import AddPage from "./components/add-page";
-import {login} from "./api/firebase";
-import Navbar from './components/navbar';
+import {Route, Routes} from 'react-router-dom';
 
+import React, {lazy} from "react";
+
+const MyRest = lazy(() => import('../src/view/my-rest'));
+const Layout = lazy(() => import('./components/layout'));
 
 function App() {
-  const [today, setToday] = useState(new Date());
-  const [addMode, setAddMode] = useState(true);
-
-  const handleAddMode = useCallback(() => {
-    setAddMode(prev => !prev);
-
-  }, []);
 
 
   return (
-    <div>
-      <Navbar/>
-      <button onClick={handleAddMode}>추가하기</button>
-      {addMode && <AddPage/>}
-      <Calendar wantDay={today} setToday={setToday}/>
-    </div>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<MyRest/>}>
+        </Route>
+      </Routes>
+    </Layout>
   );
 }
 
