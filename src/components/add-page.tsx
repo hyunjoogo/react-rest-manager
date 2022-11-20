@@ -117,10 +117,10 @@ const AddPage = () => {
                 </div>
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="datePicker" className="block text-sm font-medium text-gray-700">
-                      날짜 선택
+                    <label htmlFor="" className="block text-sm font-medium text-gray-700">
+                      휴가 일정 선택
                     </label>
-                    <DatePicker onChange={console.log}></DatePicker>
+                    {/* 유형, 사용유형이 선택되어 있지 않으면 안됨 */}
                     <MiniCalendar/>
                   </div>
                 </div>
