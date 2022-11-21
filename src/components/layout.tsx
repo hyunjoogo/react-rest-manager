@@ -7,7 +7,7 @@ type LayoutComponent = {
 const Layout = ({children}: LayoutComponent) => {
   return (
     <div>
-      <Navbar/>
+
       {children}
     </div>
   );

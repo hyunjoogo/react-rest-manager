@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {DateType} from "../components/add-page";
+import {DateType} from '../pages/add-page';
 
 interface DateFormat {
   (value?: Date | DateType | null, format?: string): string;

@@ -1,21 +1,15 @@
 import './App.css';
-import {Route, Routes} from 'react-router-dom';
-
-import React, {lazy} from "react";
-
-const MyRest = lazy(() => import('../src/view/my-rest'));
-const Layout = lazy(() => import('./components/layout'));
+import React from "react";
+import {AuthContextProvider} from './components/context/AuthContext';
+import Navbar from "./components/navbar";
+import {Outlet} from 'react-router-dom';
 
 function App() {
-
-
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<MyRest/>}>
-        </Route>
-      </Routes>
-    </Layout>
+    <AuthContextProvider>
+      <Navbar/>
+      <Outlet/>
+    </AuthContextProvider>
   );
 }
 

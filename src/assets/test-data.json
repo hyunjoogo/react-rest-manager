@@ -1,0 +1,57 @@
+{
+  "admins": "61PnszykzXN643UrVfEaSQCDiEw1",
+  "user" : {
+    "61PnszykzXN643UrVfEaSQCDiEw1" : {
+      "uid" : "61PnszykzXN643UrVfEaSQCDiEw1",
+      "restRemainDay": {
+        "takeoff": {
+          "total": 15,
+          "remainDay": 12.5
+        },
+        "vacation": {
+          "total": 5,
+          "remainDay": 0
+        },
+        "replace": {
+          "total": 3,
+          "remainDay": 1
+        }
+      },
+      "myRestList": {
+        "20221013": [
+          {
+            "date": "2022-10-13",
+            "category": "takeoff",
+            "useType": "tmo",
+            "deduction": 1,
+            "publicReason": "test1",
+            "privateReason": "test1",
+            "createDt" : "",
+          }
+        ],
+        "20221014": [
+          {
+            "date": "2022-10-14",
+            "category": "takeoff",
+            "useType": "tmo",
+            "deduction": 1,
+            "publicReason": "test2",
+            "privateReason": "test2",
+            "createDt" : ""
+          }
+        ],
+        "20221015": [
+          {
+            "date": "2022-10-15",
+            "category": "takeoff",
+            "useType": "tao",
+            "deduction": 0.5,
+            "publicReason": "test3",
+            "privateReason": "test3",
+            "createDt" : ""
+          }
+        ]
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ import {
 import {classStr} from "../utils/classStr";
 import ONLY_REST from '../assets/json/only-rest-date.json';
 
-type CalendarList = {
+export type CalendarList = {
   dateNum: number,
   fullDate: string,
   isCurrentMonth: boolean,
@@ -39,7 +39,7 @@ const MiniCalendar = () => {
   useEffect(() => {
     // console.log(format(toStartOfNextMonth(currentMonth), Format.YYYY_MM_DD_HHmmss));
     const dayList = ['일', '월', '화', '수', '목', '금', '토'];
-    const today1 = {
+    const todayInfo = {
       year: currentMonth.getFullYear(),
       month: currentMonth.getMonth() + 1, //  1 ~ 12
       date: currentMonth.getDate(),
@@ -97,7 +97,7 @@ const MiniCalendar = () => {
 
     // 이번달 내용 표시하기
     for (let i = 1; i < thisMonthLast.date + 1; i++) {
-      const date = changeDate(today1.year, today1.month, i) as string;
+      const date = changeDate(todayInfo.year, todayInfo.month, i) as string;
       const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
 
       let temp: CalendarList = {
@@ -140,7 +140,6 @@ const MiniCalendar = () => {
     if (!value.isCurrentMonth) {
       classArr.push('notCurrent');
     }
-
     if (selectsDate.includes(value.fullDate)) {
       classArr.push('selected');
     }

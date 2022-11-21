@@ -1,16 +1,23 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import {changeDate} from "../utils/changeDate";
 import REST_JSON from '../assets/json/rest-data.json';
+import {
+  Format,
+  format, nextMonth,
+  prevMonth,
+  toEndOfMonth,
+  toEndOfPrevMonth,
+  toStartOfMonth,
+  toStartOfNextMonth,
+  whatDay
+} from "../utils/DateUtil";
+import ONLY_REST from "../assets/json/only-rest-date.json";
+import {CalendarList} from "./mini-calendar";
+import {classStr} from "../utils/classStr";
 
 type CalendarProps = {
   wantDay: Date;
   setToday: Dispatch<SetStateAction<Date>>
-}
-
-type CalendarList = {
-  dateNum: number,
-  fullDate: string,
-  daysName?: string,
 }
 
 export type RestDataType = {
@@ -18,30 +25,28 @@ export type RestDataType = {
 }
 
 
-const Calendar = ({wantDay, setToday}: CalendarProps) => {
-  const [month, setMonth] = useState();
+const Calendar = () => {
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
 
+  const [selectsDate, setSelectDate] = useState<string[]>([]);
 
   useEffect(() => {
-    // let now = new Date(2022,11, 1);
-    let now = wantDay;
-    // console.log(wantDay);
 
     const dayList = ['일', '월', '화', '수', '목', '금', '토'];
-    const today = {
-      year: now.getFullYear(),
-      month: now.getMonth() + 1, //  1 ~ 12
-      date: now.getDate(),
-      day: now.getDay(), // 0 ~ 6
-      ko: dayList[now.getDay()]
+    const todayInfo = {
+      year: currentMonth.getFullYear(),
+      month: currentMonth.getMonth() + 1, //  1 ~ 12
+      date: currentMonth.getDate(),
+      day: currentMonth.getDay(), // 0 ~ 6
+      ko: dayList[currentMonth.getDay()]
     };
 
-    const firstDayOfThisMonth = new Date(today.year, today.month - 1, 1);
-    const lastDayOfThisMonth = new Date(today.year, today.month, 0);
-    const lastDayOfPrevMonth = new Date(today.year, today.month - 1, 0); // 이전달 마지막 날
-    const firstDayOfNextMonth = new Date(today.year, today.month, 1);
-
+    const firstDayOfThisMonth = toStartOfMonth(currentMonth);
+    const lastDayOfThisMonth = toEndOfMonth(currentMonth);
+    const lastDayOfPrevMonth = toEndOfPrevMonth(currentMonth);
+    const firstDayOfNextMonth = toStartOfNextMonth(currentMonth);
 
     // 이번달 마지막 날은 언제?
     const thisMonthLast = {
@@ -71,101 +76,150 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
 
     const tempList: CalendarList[] = [];
 
+    // 이전달 내용 표시
     for (let i = firstDayOfThisMonth.getDay() - 1; i > -1; i--) {
       const prevMonthRemainDate = prevMonthLast.date - i;
+      const date = changeDate(prevMonthLast.year, prevMonthLast.month, prevMonthRemainDate);
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
       tempList.push({
         dateNum: prevMonthRemainDate,
-        fullDate: changeDate(prevMonthLast.year, prevMonthLast.month, prevMonthRemainDate),
+        fullDate: date,
+        isCurrentMonth: false,
+        isHoliday: isHoliday,
       });
     }
+
+    // 이번달 내용 표시하기
     for (let i = 1; i < thisMonthLast.date + 1; i++) {
-      // 이번달 내용 표시하기
-      const year = today.year.toString() as string;
-      const json: RestDataType = REST_JSON[year as keyof typeof REST_JSON];
-      const date = changeDate(today.year, today.month, i) as string;
+      const date = changeDate(todayInfo.year, todayInfo.month, i) as string;
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
 
       let temp: CalendarList = {
         dateNum: i,
-        fullDate: changeDate(today.year, today.month, i),
+        fullDate: date,
+        isCurrentMonth: true,
+        isHoliday: isHoliday,
       };
 
-      if (json && typeof json[date] === 'string') {
-        temp["daysName"] = json[date];
-      }
+      // if (json && typeof json[date] === 'string') {
+      //   temp["daysName"] = json[date];
+      // }
+
       tempList.push(temp);
     }
 
+    // 다음달 내용 표시
     for (let i = thisMonthLast.day + 1; i < 7; i++) {
+      const date = changeDate(nextMonthFirst.year, nextMonthFirst.month, i - thisMonthLast.day);
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
       tempList.push({
         dateNum: i - thisMonthLast.day,
-        fullDate: changeDate(nextMonthFirst.year, nextMonthFirst.month, i - thisMonthLast.day)
+        fullDate: date,
+        isCurrentMonth: false,
+        isHoliday: isHoliday,
       });
     }
-    setToday(wantDay);
+    // console.log(tempList);
     setCalendarList(tempList);
-  }, [wantDay]);
+  }, [currentMonth]);
 
-  const handleMonth = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const button: HTMLButtonElement = e.currentTarget;
-    setToday(prevState => {
-      const year = prevState.getFullYear();
-      const targetMonth = button.name === "next" ? prevState.getMonth() + 1 : prevState.getMonth() - 1;
-      const date = prevState.getDate();
-      return new Date(year, targetMonth, date);
-    });
+  // 특정 일자에 맞게 클래스 변경해주는 함수
+  const makeClassName = (value: CalendarList, dayofweekNum: number) => {
+    const classArr: string[] = [value.fullDate];
+    if (value.fullDate === format(today)) {
+      classArr.push('today');
+    }
+    if (dayofweekNum === 6) {
+      classArr.push('sat');
+    }
+    if (value.isHoliday) {
+      classArr.push('holiday');
+    }
+    if (!value.isCurrentMonth) {
+      classArr.push('notCurrent');
+    }
+    if (selectsDate.includes(value.fullDate)) {
+      classArr.push('selected');
+    }
+
+    return classStr(classArr);
   };
 
+  const clickDay = (e: React.MouseEvent) => {
+    const target = e.target as Element;
+    const targetDate = target.classList[0] as string;
+
+    if (target.classList.contains('holiday')) {
+      return;
+    }
+
+    setSelectDate(prev => {
+      if (prev.includes(targetDate)) {
+        return prev.filter(date => date !== targetDate);
+      }
+
+      return [...prev, targetDate];
+    });
+    console.log(targetDate);
+    target.classList.toggle('selected');
+  };
+
+  const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget;
+    if (target.name === "prev") {
+      setCurrentMonth(prev => prevMonth(prev));
+    } else if (target.name === "next") {
+      setCurrentMonth(prev => nextMonth(prev));
+    } else {
+      console.error('잘못된 파라미터 입니다.');
+    }
+  }, [currentMonth]);
+
   return (
-    <div className="calendar-wrapper bg-gray-50 px-4 py-3 text-left sm:px-6 text-sm">
-      <div className="calendar__nav">
+    <section className="big-calendar">
+      <div className="calendar__navi">
         <button
-          className="prev"
           name="prev"
-          onClick={handleMonth}
+          className="calendar__nav--previous p-2"
+          onClick={handleCurrentMonth}
         >﹤
         </button>
-        <p className="this__month">{wantDay.getFullYear()}-{wantDay.getMonth() + 1}</p>
+        <p className="calendar__nav--month p-2" onClick={() => console.log(selectsDate)}>
+          {format(currentMonth, Format.YYYY_MM)}
+        </p>
         <button
-          className="next"
           name="next"
-          onClick={handleMonth}
+          className="calendar__nav--next p-2"
+          onClick={handleCurrentMonth}
         >﹥
         </button>
       </div>
-      <section className="calendar__body"></section>
-      <table className="calendar">
+      <table className="calendar__container">
         <thead>
         <tr>
-          <th className="day red">일</th>
-          <th className="day">월</th>
-          <th className="day">화</th>
-          <th className="day">수</th>
-          <th className="day">목</th>
-          <th className="day">금</th>
-          <th className="day sat">토</th>
+          <th className="dayofweek sunday">일</th>
+          <th className="dayofweek">월</th>
+          <th className="dayofweek">화</th>
+          <th className="dayofweek">수</th>
+          <th className="dayofweek">목</th>
+          <th className="dayofweek">금</th>
+          <th className="dayofweek">토</th>
         </tr>
         </thead>
         <tbody>
-
-        {calendarList.map((value, index) => {
+        {calendarList.map((_, index) => {
           if (index % 7 === 0) {
             return (
               <tr key={index}>
-                {[0, 1, 2, 3, 4, 5, 6].map((count) => {
-                  const temp = calendarList[index + count];
+                {[0, 1, 2, 3, 4, 5, 6].map((count, dayofweekNum) => {
+                  const temp = calendarList[index + count] as CalendarList;
                   return (
-                    <td className={value.fullDate} key={index + count}>
-                      <div className="days_wrapper">
-                        <div className="days_title flex">
-                          <p className="days">{temp?.dateNum}</p>
-                          <p className="days-name">
-                            {temp?.daysName}
-                          </p>
-                        </div>
-                        <div className="days_content_wrapper">
-                          <div className="days_content"></div>
-                        </div>
-                      </div>
+                    <td
+                      className={makeClassName(temp, dayofweekNum)}
+                      key={index + count}
+                      onClick={clickDay}
+                    >
+                      {temp.dateNum}
                     </td>
                   );
                 })}
@@ -175,10 +229,9 @@ const Calendar = ({wantDay, setToday}: CalendarProps) => {
             return null;
           }
         })}
-
         </tbody>
       </table>
-    </div>
+    </section>
   )
     ;
 };

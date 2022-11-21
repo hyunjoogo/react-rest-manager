@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {insertAtInString} from "../utils/changeDate";
-import {format} from "../utils/DateUtil";
 import ONLY_REST_JSON from "../assets/json/only-rest-date.json";
-import {DateType} from "./add-page";
+import { DateType } from '../pages/add-page';
+
 
 const DatePicker = () => {
   const [startDate, setStartDate] = useState<DateType>(null);

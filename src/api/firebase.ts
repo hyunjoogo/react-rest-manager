@@ -1,6 +1,6 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from "firebase/auth";
-import {getFirestore} from 'firebase/firestore/lite';
+import {get, getDatabase, ref} from "firebase/database";
 import {User} from "@firebase/auth";
 
 const firebaseConfig = {
@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
+const database = getDatabase(app);
 
 
 export const login = () => {
@@ -25,7 +25,29 @@ export function logout() {
   signOut(auth).catch(console.error);
 }
 
-export const onUserStateChange = (callback: (user: User | null) => void) => {
-  onAuthStateChanged(auth, callback);
+
+export const onUserStateChange = (callback: any) => {
+  onAuthStateChanged(auth, async (user) => {
+    const updatedUser: any = user ? await adminUser(user) : null;
+    callback(updatedUser);
+  });
 };
+
+
+const adminUser = async (user: User | null) => {
+  // 2. 사용자가 어드민 권한을 가지고 있는지 확인!
+  // 3. {...user, isAdmin : true/false}
+  return get(ref(database, 'admins'))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const admins = snapshot.val();
+        const isAdmin: boolean = admins.includes(user?.uid);
+        return {...user, isAdmin};
+      }
+      return user;
+    }).catch((error) => {
+      console.error(error);
+    });
+};
+
 
