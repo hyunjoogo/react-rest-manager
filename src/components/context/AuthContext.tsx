@@ -3,11 +3,13 @@ import {getAuth, User} from "firebase/auth";
 import {login, logout, onUserStateChange} from "../../api/firebase";
 import {UserState} from "../navbar";
 
-interface Store {
+export type Store = {
   user: UserState | null;
   login: () => void;
   logout: () => void;
-  setUser :  React.Dispatch<React.SetStateAction<User | null>>
+  setUser :  React.Dispatch<React.SetStateAction<User | null>>;
+  isModalOpen : boolean;
+  setIsModalOpen :  React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type AuthContextProviderProps = {
@@ -17,6 +19,7 @@ type AuthContextProviderProps = {
 const AuthContext = createContext<Store | null>(null);
 
 export function AuthContextProvider({children}: AuthContextProviderProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -26,7 +29,7 @@ export function AuthContextProvider({children}: AuthContextProviderProps) {
   }, []);
 
   const store: Store = {
-    user, login, logout, setUser
+    user, login, logout, setUser, isModalOpen, setIsModalOpen
   };
 
   return (

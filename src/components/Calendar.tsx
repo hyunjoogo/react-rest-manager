@@ -1,9 +1,9 @@
-import React, {Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {changeDate} from "../utils/changeDate";
-import REST_JSON from '../assets/json/rest-data.json';
 import {
   Format,
-  format, nextMonth,
+  format,
+  nextMonth,
   prevMonth,
   toEndOfMonth,
   toEndOfPrevMonth,
@@ -14,25 +14,48 @@ import {
 import ONLY_REST from "../assets/json/only-rest-date.json";
 import {CalendarList} from "./mini-calendar";
 import {classStr} from "../utils/classStr";
-
-type CalendarProps = {
-  wantDay: Date;
-  setToday: Dispatch<SetStateAction<Date>>
-}
+import REST_DATA from '../assets/json/rest-data.json';
+import {getMyRestList} from "../api/firebase";
+import {useQuery} from "@tanstack/react-query";
+import RestBar from "./RestBar";
+import {useAuthContext} from "./context/AuthContext";
+import MyModal from "./modal/MyModal";
 
 export type RestDataType = {
-  [key: string]: string;
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+export type RestType = {
+  "category": string,
+  "createDt": string,
+  "date": string,
+  "deduction": number,
+  "privateReason": string,
+  "publicReason": string,
+  "useType": string
 }
 
-
 const Calendar = () => {
+  const {isLoading, error, data: myRestList} = useQuery(
+    ['myRestList'], getMyRestList,
+    {staleTime: 1000 * 60 * 5}
+  );
+
+  const context = useAuthContext();
+  const setIsModalOpen  = context?.setIsModalOpen
+
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
-
   const [selectsDate, setSelectDate] = useState<string[]>([]);
+  const [onDetailScreen, setOnDetailScreen] = useState(false);
 
   useEffect(() => {
+
+    // fetchMyRest()
+    // 서버에서 자료를 가지고 오고
+    // 맞는 자료가 있으면 뿌려주기
 
     const dayList = ['일', '월', '화', '수', '목', '금', '토'];
     const todayInfo = {
@@ -80,7 +103,7 @@ const Calendar = () => {
     for (let i = firstDayOfThisMonth.getDay() - 1; i > -1; i--) {
       const prevMonthRemainDate = prevMonthLast.date - i;
       const date = changeDate(prevMonthLast.year, prevMonthLast.month, prevMonthRemainDate);
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date);
       tempList.push({
         dateNum: prevMonthRemainDate,
         fullDate: date,
@@ -92,7 +115,7 @@ const Calendar = () => {
     // 이번달 내용 표시하기
     for (let i = 1; i < thisMonthLast.date + 1; i++) {
       const date = changeDate(todayInfo.year, todayInfo.month, i) as string;
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date);
 
       let temp: CalendarList = {
         dateNum: i,
@@ -101,9 +124,12 @@ const Calendar = () => {
         isHoliday: isHoliday,
       };
 
-      // if (json && typeof json[date] === 'string') {
-      //   temp["daysName"] = json[date];
-      // }
+      const json: RestDataType = REST_DATA;
+      const thisYearHolidayJson = json[String(todayInfo.year)]!;
+
+      if (typeof thisYearHolidayJson[date] === "string") {
+        temp["daysName"] = thisYearHolidayJson[date];
+      }
 
       tempList.push(temp);
     }
@@ -111,7 +137,7 @@ const Calendar = () => {
     // 다음달 내용 표시
     for (let i = thisMonthLast.day + 1; i < 7; i++) {
       const date = changeDate(nextMonthFirst.year, nextMonthFirst.month, i - thisMonthLast.day);
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
+      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date);
       tempList.push({
         dateNum: i - thisMonthLast.day,
         fullDate: date,
@@ -119,9 +145,14 @@ const Calendar = () => {
         isHoliday: isHoliday,
       });
     }
-    // console.log(tempList);
     setCalendarList(tempList);
+
   }, [currentMonth]);
+
+
+  if (isLoading) {
+    return <span>Loading</span>;
+  }
 
   // 특정 일자에 맞게 클래스 변경해주는 함수
   const makeClassName = (value: CalendarList, dayofweekNum: number) => {
@@ -160,11 +191,10 @@ const Calendar = () => {
 
       return [...prev, targetDate];
     });
-    console.log(targetDate);
     target.classList.toggle('selected');
   };
 
-  const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCurrentMonth = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.currentTarget;
     if (target.name === "prev") {
       setCurrentMonth(prev => prevMonth(prev));
@@ -173,65 +203,93 @@ const Calendar = () => {
     } else {
       console.error('잘못된 파라미터 입니다.');
     }
-  }, [currentMonth]);
+  };
+
+  const showMyRestDay = (value: CalendarList) => {
+    const list = Object.keys(myRestList);
+    if (list.includes(value.fullDate)) {
+      return myRestList[value.fullDate].map((rest: RestType, index: number) => (
+        <RestBar rest={rest} key={index} onDetail={onDetail}/>
+      ));
+    }
+    return null;
+  };
+
+  const onDetail = (rest: RestType) => {
+    if (setIsModalOpen) {
+      setIsModalOpen(true);
+    }
+    console.log(rest);
+
+  };
 
   return (
-    <section className="big-calendar">
-      <div className="calendar__navi">
-        <button
-          name="prev"
-          className="calendar__nav--previous p-2"
-          onClick={handleCurrentMonth}
-        >﹤
-        </button>
-        <p className="calendar__nav--month p-2" onClick={() => console.log(selectsDate)}>
-          {format(currentMonth, Format.YYYY_MM)}
-        </p>
-        <button
-          name="next"
-          className="calendar__nav--next p-2"
-          onClick={handleCurrentMonth}
-        >﹥
-        </button>
-      </div>
-      <table className="calendar__container">
-        <thead>
-        <tr>
-          <th className="dayofweek sunday">일</th>
-          <th className="dayofweek">월</th>
-          <th className="dayofweek">화</th>
-          <th className="dayofweek">수</th>
-          <th className="dayofweek">목</th>
-          <th className="dayofweek">금</th>
-          <th className="dayofweek">토</th>
-        </tr>
-        </thead>
-        <tbody>
-        {calendarList.map((_, index) => {
-          if (index % 7 === 0) {
-            return (
-              <tr key={index}>
-                {[0, 1, 2, 3, 4, 5, 6].map((count, dayofweekNum) => {
-                  const temp = calendarList[index + count] as CalendarList;
-                  return (
-                    <td
-                      className={makeClassName(temp, dayofweekNum)}
-                      key={index + count}
-                      onClick={clickDay}
-                    >
-                      {temp.dateNum}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          } else {
-            return null;
-          }
-        })}
-        </tbody>
-      </table>
-    </section>
+    <>
+      {isLoading && <p>Loading...</p>}
+      {/*{error && <p>{error}</p>}*/}
+
+      <section className="big-calendar">
+        <div className="calendar__navi">
+          <button
+            name="prev"
+            className="calendar__nav--previous p-2"
+            onClick={handleCurrentMonth}
+          >﹤
+          </button>
+          <p className="calendar__nav--month p-2" onClick={() => console.log(selectsDate)}>
+            {format(currentMonth, Format.YYYY_MM)}
+          </p>
+          <button
+            name="next"
+            className="calendar__nav--next p-2"
+            onClick={handleCurrentMonth}
+          >﹥
+          </button>
+        </div>
+        <table className="calendar__container">
+          <thead>
+          <tr>
+            <th className="dayofweek sunday">일</th>
+            <th className="dayofweek">월</th>
+            <th className="dayofweek">화</th>
+            <th className="dayofweek">수</th>
+            <th className="dayofweek">목</th>
+            <th className="dayofweek">금</th>
+            <th className="dayofweek">토</th>
+          </tr>
+          </thead>
+          <tbody>
+          {calendarList.map((_, index) => {
+            if (index % 7 === 0) {
+              return (
+                <tr key={index}>
+                  {[0, 1, 2, 3, 4, 5, 6].map((count, dayofweekNum) => {
+                    const temp = calendarList[index + count] as CalendarList;
+                    return (
+                      <td
+                        className={makeClassName(temp, dayofweekNum)}
+                        key={index + count}
+                        onClick={clickDay}
+                      >
+                        <div>
+                          <span className="dateNum">{temp.dateNum}</span>
+                          <span className="dateName">{temp.daysName}</span>
+                        </div>
+                        {myRestList && showMyRestDay(temp)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            } else {
+              return null;
+            }
+          })}
+          </tbody>
+        </table>
+      </section>
+      <MyModal title={"hello"} body={<>a</>}/>
+    </>
   )
     ;
 };

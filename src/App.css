@@ -29,49 +29,73 @@ th {
 }
 
 
-.mini-calendar .calendar__container {
+.calendar__container {
     cursor: default;
     @apply w-full text-center
 }
 
-.mini-calendar .calendar__navi {
+.calendar__navi {
     border: 1px solid #E5EAEE;
     @apply flex justify-between
 }
 
-.mini-calendar .calendar__container {
+.big-calendar .calendar__container tbody {
     cursor: default;
-    @apply w-full
+    @apply text-left
 }
 
-.mini-calendar .calendar__container thead {
+.calendar__container thead {
     border-left: 1px solid #E5EAEE;
     border-right: 1px solid #E5EAEE;
 }
 
-.mini-calendar .calendar__container .holiday {
+.calendar__container .holiday {
     color: red;
-    cursor: not-allowed;
 }
-.mini-calendar .calendar__container .sat.holiday {
+
+.calendar__container .sat.holiday {
     color: inherit;
 }
 
-.mini-calendar .calendar__container .notCurrent {
-    color: gray;
-    opacity: 0.5;
+.calendar__container .dateNum {
+    @apply mr-2
 }
-.mini-calendar .calendar__container .sat.holiday.notCurrent {
+
+.calendar__container .dateName {
+    font-size: 0.75rem;
+    color: gray;
+    @apply mr-2
+}
+
+.calendar__container .notCurrent {
     color: gray;
     opacity: 0.5;
 }
 
-.mini-calendar .calendar__container .today {
+.calendar__container .today {
     background-color: #EBF4FD;
 }
+
+.calendar__container .sat.holiday.notCurrent {
+    color: gray;
+    opacity: 0.5;
+}
+
 
 .mini-calendar .calendar__container .selected {
     background-color: #0D5CE0;
     color: white;
 }
+
+.big-calendar .calendar__container tbody td {
+    height: 100px;
+    width: calc(100% / 7);
+    vertical-align: baseline;
+}
+
+.big-calendar .calendar__container tbody td .rest-content {
+    background-color: #0D5CE0;
+    color: white;
+}
+
 

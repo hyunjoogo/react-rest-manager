@@ -1,8 +1,8 @@
 {
   "admins": "61PnszykzXN643UrVfEaSQCDiEw1",
-  "user" : {
-    "61PnszykzXN643UrVfEaSQCDiEw1" : {
-      "uid" : "61PnszykzXN643UrVfEaSQCDiEw1",
+  "user": {
+    "61PnszykzXN643UrVfEaSQCDiEw1": {
+      "uid": "61PnszykzXN643UrVfEaSQCDiEw1",
       "restRemainDay": {
         "takeoff": {
           "total": 15,
@@ -26,7 +26,7 @@
             "deduction": 1,
             "publicReason": "test1",
             "privateReason": "test1",
-            "createDt" : "",
+            "createDt": ""
           }
         ],
         "20221014": [
@@ -37,7 +37,7 @@
             "deduction": 1,
             "publicReason": "test2",
             "privateReason": "test2",
-            "createDt" : ""
+            "createDt": ""
           }
         ],
         "20221015": [
@@ -48,7 +48,7 @@
             "deduction": 0.5,
             "publicReason": "test3",
             "privateReason": "test3",
-            "createDt" : ""
+            "createDt": ""
           }
         ]
       }
