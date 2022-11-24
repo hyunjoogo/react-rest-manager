@@ -50,6 +50,17 @@
             "privateReason": "test3",
             "createDt": ""
           }
+        ],
+        "20221115": [
+          {
+            "date": "2022-11-15",
+            "category": "takeoff",
+            "useType": "tao",
+            "deduction": 0.5,
+            "publicReason": "test4",
+            "privateReason": "test4",
+            "createDt": ""
+          }
         ]
       }
     }

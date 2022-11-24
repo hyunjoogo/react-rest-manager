@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {User} from "@firebase/auth";
-import {login, logout, onUserStateChange} from "../api/firebase";
-import UserComponent from './user';
 import {Link} from 'react-router-dom';
-import Button from "./ui/Button";
+import UserComponent from '../user';
+import Button from './Button';
+import {login, logout, onUserStateChange} from "../../api/firebase";
 
 
 export interface UserState extends User {

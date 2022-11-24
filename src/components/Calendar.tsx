@@ -18,8 +18,8 @@ import REST_DATA from '../assets/json/rest-data.json';
 import {getMyRestList} from "../api/firebase";
 import {useQuery} from "@tanstack/react-query";
 import RestBar from "./RestBar";
-import {useAuthContext} from "./context/AuthContext";
-import MyModal from "./modal/MyModal";
+import DialogManager from "../dialog/DialogManager";
+import DetailMyRest from "../pages/DetailMyRest";
 
 export type RestDataType = {
   [key: string]: {
@@ -41,9 +41,6 @@ const Calendar = () => {
     ['myRestList'], getMyRestList,
     {staleTime: 1000 * 60 * 5}
   );
-
-  const context = useAuthContext();
-  const setIsModalOpen  = context?.setIsModalOpen
 
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
@@ -216,18 +213,19 @@ const Calendar = () => {
   };
 
   const onDetail = (rest: RestType) => {
-    if (setIsModalOpen) {
-      setIsModalOpen(true);
-    }
-    console.log(rest);
-
+    DialogManager.push(
+      <DetailMyRest
+        show={false}
+        restData={rest}
+        onClose={(result: string) => console.log(result)}/>
+    );
   };
+
 
   return (
     <>
       {isLoading && <p>Loading...</p>}
       {/*{error && <p>{error}</p>}*/}
-
       <section className="big-calendar">
         <div className="calendar__navi">
           <button
@@ -288,7 +286,6 @@ const Calendar = () => {
           </tbody>
         </table>
       </section>
-      <MyModal title={"hello"} body={<>a</>}/>
     </>
   )
     ;
