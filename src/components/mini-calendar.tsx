@@ -1,19 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {changeDate} from "../utils/changeDate";
-import REST_JSON from "../assets/json/rest-data.json";
-import {RestDataType} from "./Calendar";
-import {
-  Format,
-  format,
-  nextMonth,
-  prevMonth,
-  toEndOfMonth,
-  toEndOfPrevMonth,
-  toStartOfMonth,
-  toStartOfNextMonth, whatDay
-} from "../utils/DateUtil";
+import {Format, format, nextMonth, prevMonth} from "../utils/DateUtil";
 import {classStr} from "../utils/classStr";
-import ONLY_REST from '../assets/json/only-rest-date.json';
 import {FormDate} from "../pages/add-page";
 import {makeCalendar} from "./makeCalendar";
 
@@ -36,7 +23,7 @@ type MiniCalendarProps = {
 }
 
 const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
-  console.log(setFormData);
+  // console.log(setFormData);
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
@@ -44,7 +31,7 @@ const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
   const [selectsDate, setSelectDate] = useState<string[]>([]);
 
   useEffect(() => {
-    const newCalendar = makeCalendar(currentMonth)
+    const newCalendar = makeCalendar(currentMonth);
     setCalendarList(newCalendar);
   }, [currentMonth]);
 
@@ -77,24 +64,14 @@ const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
     if (target.classList.contains('holiday')) {
       return;
     }
-    // 폼데이터에 추가시키는 작업해야함
-    // let temp: string[] = [];
-    setSelectDate(prev => {
-      console.log(prev);
-      if (prev.includes(targetDate)) {
-        return prev.filter(date => date !== targetDate);
-      }
-      // temp.push(...prev);
-      // temp.push(targetDate)
-      return [...prev, targetDate];
-    });
-
-    // setFormData(prev => {
-    //   console.log(temp);
-    //   return {...prev, date: temp};
-    // });
-
     target.classList.toggle('selected');
+
+    const newSelectsDate = selectsDate.includes(targetDate)
+      ? selectsDate.filter(date => date !== targetDate)
+      : [...selectsDate, targetDate];
+
+    setFormData(prev => ({...prev, date: newSelectsDate}));
+    setSelectDate(newSelectsDate);
   };
 
   const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
