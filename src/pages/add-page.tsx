@@ -3,13 +3,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
 
 
-interface FormDate {
-  category: string,
-  useType: string,
-  startDt: string,
-  endDt: string,
-  publicReason: string,
-  privateReason: string
+export interface FormDate {
+  category: string;
+  useType: string;
+  date: string[];
+  publicReason: string;
+  privateReason: string;
 }
 
 export type DateType = Date | null
@@ -27,8 +26,7 @@ const AddPage = () => {
   const [formData, setFormData] = useState<FormDate>({
     category: "",
     useType: "",
-    startDt: "",
-    endDt: "",
+    date: [],
     publicReason: "",
     privateReason: ""
   });
@@ -37,7 +35,6 @@ const AddPage = () => {
   useEffect(() => {
 
   }, []);
-
 
 
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -115,7 +112,7 @@ const AddPage = () => {
                       휴가 일정 선택
                     </label>
                     {/* 유형, 사용유형이 선택되어 있지 않으면 안됨 */}
-                    <MiniCalendar/>
+                    <MiniCalendar setFormData={setFormData}/>
                   </div>
                 </div>
                 <div className="grid grid-cols-6 gap-6">

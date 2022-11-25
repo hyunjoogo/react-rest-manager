@@ -14,6 +14,8 @@ import {
 } from "../utils/DateUtil";
 import {classStr} from "../utils/classStr";
 import ONLY_REST from '../assets/json/only-rest-date.json';
+import {FormDate} from "../pages/add-page";
+import {makeCalendar} from "./makeCalendar";
 
 export type CalendarList = {
   dateNum: number,
@@ -29,7 +31,12 @@ type SelectsDate = {
 }
 
 
-const MiniCalendar = () => {
+type MiniCalendarProps = {
+  setFormData: React.Dispatch<React.SetStateAction<FormDate>>
+}
+
+const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
+  console.log(setFormData);
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
@@ -37,92 +44,8 @@ const MiniCalendar = () => {
   const [selectsDate, setSelectDate] = useState<string[]>([]);
 
   useEffect(() => {
-    // console.log(format(toStartOfNextMonth(currentMonth), Format.YYYY_MM_DD_HHmmss));
-    const dayList = ['일', '월', '화', '수', '목', '금', '토'];
-    const todayInfo = {
-      year: currentMonth.getFullYear(),
-      month: currentMonth.getMonth() + 1, //  1 ~ 12
-      date: currentMonth.getDate(),
-      day: currentMonth.getDay(), // 0 ~ 6
-      ko: dayList[currentMonth.getDay()]
-    };
-
-
-    const firstDayOfThisMonth = toStartOfMonth(currentMonth);
-    const lastDayOfThisMonth = toEndOfMonth(currentMonth);
-    const lastDayOfPrevMonth = toEndOfPrevMonth(currentMonth);
-    const firstDayOfNextMonth = toStartOfNextMonth(currentMonth);
-
-
-    // 이번달 마지막 날은 언제?
-    const thisMonthLast = {
-      year: lastDayOfThisMonth.getFullYear(),
-      month: lastDayOfThisMonth.getMonth() + 1,
-      date: lastDayOfThisMonth.getDate(),
-      day: lastDayOfThisMonth.getDay(),
-      ko: dayList[lastDayOfThisMonth.getDay()]
-    };
-
-    // 이전 달에 대한 정보
-    const prevMonthLast = {
-      year: lastDayOfPrevMonth.getFullYear(),
-      month: lastDayOfPrevMonth.getMonth() + 1,
-      date: lastDayOfPrevMonth.getDate(),
-      day: lastDayOfPrevMonth.getDay(),
-      ko: dayList[lastDayOfPrevMonth.getDay()]
-    };
-
-    const nextMonthFirst = {
-      year: firstDayOfNextMonth.getFullYear(),
-      month: firstDayOfNextMonth.getMonth() + 1,
-      date: firstDayOfNextMonth.getDate(),
-      day: firstDayOfNextMonth.getDay(),
-      ko: dayList[firstDayOfNextMonth.getDay()]
-    };
-
-    const tempList: CalendarList[] = [];
-
-    // 이전달 내용 표시
-    for (let i = firstDayOfThisMonth.getDay() - 1; i > -1; i--) {
-      const prevMonthRemainDate = prevMonthLast.date - i;
-      const date = changeDate(prevMonthLast.year, prevMonthLast.month, prevMonthRemainDate);
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
-      tempList.push({
-        dateNum: prevMonthRemainDate,
-        fullDate: date,
-        isCurrentMonth: false,
-        isHoliday: isHoliday,
-      });
-    }
-
-    // 이번달 내용 표시하기
-    for (let i = 1; i < thisMonthLast.date + 1; i++) {
-      const date = changeDate(todayInfo.year, todayInfo.month, i) as string;
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
-
-      let temp: CalendarList = {
-        dateNum: i,
-        fullDate: date,
-        isCurrentMonth: true,
-        isHoliday: isHoliday,
-      };
-
-      tempList.push(temp);
-    }
-
-    // 다음달 내용 표시
-    for (let i = thisMonthLast.day + 1; i < 7; i++) {
-      const date = changeDate(nextMonthFirst.year, nextMonthFirst.month, i - thisMonthLast.day);
-      const isHoliday = whatDay(date) === 0 || whatDay(date) === 6 || ONLY_REST["restDayList"].includes(date)
-      tempList.push({
-        dateNum: i - thisMonthLast.day,
-        fullDate: date,
-        isCurrentMonth: false,
-        isHoliday: isHoliday,
-      });
-    }
-    // console.log(tempList);
-    setCalendarList(tempList);
+    const newCalendar = makeCalendar(currentMonth)
+    setCalendarList(newCalendar);
   }, [currentMonth]);
 
   // 특정 일자에 맞게 클래스 변경해주는 함수
@@ -154,15 +77,23 @@ const MiniCalendar = () => {
     if (target.classList.contains('holiday')) {
       return;
     }
-
+    // 폼데이터에 추가시키는 작업해야함
+    // let temp: string[] = [];
     setSelectDate(prev => {
+      console.log(prev);
       if (prev.includes(targetDate)) {
         return prev.filter(date => date !== targetDate);
       }
-
+      // temp.push(...prev);
+      // temp.push(targetDate)
       return [...prev, targetDate];
     });
-    console.log(targetDate);
+
+    // setFormData(prev => {
+    //   console.log(temp);
+    //   return {...prev, date: temp};
+    // });
+
     target.classList.toggle('selected');
   };
 
@@ -175,8 +106,6 @@ const MiniCalendar = () => {
     } else {
       console.error('잘못된 파라미터 입니다.');
     }
-
-
   }, [currentMonth]);
 
   return (
