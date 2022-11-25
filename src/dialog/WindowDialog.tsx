@@ -5,10 +5,11 @@ import {DialogProps} from "../components/type/type";
 interface WindowDialogProps extends DialogProps {
   children: ReactNode | string;
   title?: ReactNode | string;
+  footer? : ReactNode | string;
 }
 
 // TODO 키보드 ESC 누르면 닫는 기능 추가할 것
-const WindowDialog = ({show, children, title, onClose}: WindowDialogProps) => {
+const WindowDialog = ({show, children, title, footer}: WindowDialogProps) => {
   return (
     <Transition appear show={show} as={Fragment}>
       <Dialog
@@ -49,14 +50,8 @@ const WindowDialog = ({show, children, title, onClose}: WindowDialogProps) => {
                 <div className="mt-2">
                   {children}
                 </div>
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={() => onClose('확인')}
-                  >
-                    Got it, thanks!
-                  </button>
+                <div className="mt-4 text-center">
+                  {footer}
                 </div>
               </Dialog.Panel>
             </Transition.Child>
