@@ -13,7 +13,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContextProvider>
-        <Navbar/>
+        {/*<Navbar/>*/}
         <Outlet/>
         <DialogManager/>
       </AuthContextProvider>

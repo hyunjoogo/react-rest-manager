@@ -53,6 +53,27 @@ const AddPage = () => {
     setFormData(prev => ({...prev, [name]: target.value}));
   };
 
+  const renderSelectResult = () => {
+    console.log(formData);
+
+    const sortList = formData.date.sort((a, b) => Number(a) - Number(b));
+
+    // 리스트를 숫자로 바꿔
+    // 차순으로 변경
+    // 휴가유형의 잔여일수를 서버에서 가지고 오고
+    // 잔여일수 - 사용유형일수를 뺀다.
+
+    // 마이너스일 경우 세이브 버튼 비활성화
+    // 빨간색으로 표현하기
+
+    return (
+      <>
+        연차 : 2022.11.15 ~ 2022.11.15
+        잔여 일수 : 14 -﹥ 13일
+      </>
+    );
+  };
+
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +136,15 @@ const AddPage = () => {
                     <MiniCalendar setFormData={setFormData}/>
                   </div>
                 </div>
+                {formData.date.length > 0 &&
+                  <div className="grid grid-cols-6 gap-6 ">
+                    <div className="col-span-6 sm:col-span-3 border">
+                      {renderSelectResult()}
+                    </div>
+                  </div>
+                }
+
+
                 <div className="grid grid-cols-6 gap-6">
                   <div className="col-span-6 sm:col-span-3">
                     <label htmlFor="publicReason" className="block text-sm font-medium text-gray-700">
@@ -131,9 +161,6 @@ const AddPage = () => {
                         onChange={handleTextareaValue}
                       />
                     </div>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Brief description for your profile. URLs are hyperlinked.
-                    </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-6 gap-6">
@@ -152,9 +179,6 @@ const AddPage = () => {
                         onChange={handleTextareaValue}
                       />
                     </div>
-                    <p className="mt-2 text-sm text-gray-500 ">
-                      Brief description for your profile. URLs are hyperlinked.
-                    </p>
                   </div>
                 </div>
               </div>

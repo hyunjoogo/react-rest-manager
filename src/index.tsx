@@ -6,6 +6,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import NotFound from "./pages/NotFound";
 import MyRest from "./pages/my-rest";
 import ProtectedRoute from './pages/ProtectedRoute';
+import LayoutStyleExample from "./pages/LayoutStyleExample";
 
 const router = createBrowserRouter([
   {
@@ -13,7 +14,7 @@ const router = createBrowserRouter([
     element: <App/>,
     errorElement: <NotFound/>,
     children: [
-      {index: true, path: '/', element: <MyRest/>},
+      {index: true, path: '/', element: <LayoutStyleExample/>},
       {path: '/products', element: <NotFound/>},
       {
         path: '/products/new',

@@ -1,22 +1,7 @@
-import React, {useCallback, useEffect, useState} from "react";
-import {changeDate} from "../utils/changeDate";
-import {
-  Format,
-  format,
-  nextMonth,
-  prevMonth,
-  toEndOfMonth,
-  toEndOfPrevMonth,
-  toStartOfMonth,
-  toStartOfNextMonth,
-  whatDay
-} from "../utils/DateUtil";
-import ONLY_REST from "../assets/json/only-rest-date.json";
+import React, {useEffect, useState} from "react";
+import {Format, format, nextMonth, prevMonth} from "../utils/DateUtil";
 import {CalendarList} from "./mini-calendar";
 import {classStr} from "../utils/classStr";
-import REST_DATA from '../assets/json/rest-data.json';
-import {getMyRestList} from "../api/firebase";
-import {useQuery} from "@tanstack/react-query";
 import RestBar from "./RestBar";
 import DialogManager from "../dialog/DialogManager";
 import DetailMyRest from "../pages/DetailMyRest";
@@ -37,28 +22,31 @@ export type RestType = {
   "useType": string
 }
 
-const Calendar = () => {
-  const {isLoading, error, data: myRestList} = useQuery(
-    ['myRestList'], getMyRestList,
-    {staleTime: 1000 * 60 * 5}
-  );
+type CalendarProps = {
+  myRest: {
+    myRestList: {
+      [key: string]: RestType[]
+    },
+    restRemainDay: {
+      [key: string]: {
+        [key: string]: number;
+      };
+    },
+    uid: string;
+  },
+}
 
+
+const Calendar = ({myRest}: CalendarProps) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
   const [selectsDate, setSelectDate] = useState<string[]>([]);
-  const [onDetailScreen, setOnDetailScreen] = useState(false);
 
   useEffect(() => {
     const newCalendar = makeCalendar(currentMonth, true);
     setCalendarList(newCalendar);
-
   }, [currentMonth]);
-
-
-  if (isLoading) {
-    return <span>Loading</span>;
-  }
 
   // 특정 일자에 맞게 클래스 변경해주는 함수
   const makeClassName = (value: CalendarList, dayofweekNum: number) => {
@@ -112,9 +100,10 @@ const Calendar = () => {
   };
 
   const showMyRestDay = (value: CalendarList) => {
-    const list = Object.keys(myRestList);
+    const list = Object.keys(myRest.myRestList);
     if (list.includes(value.fullDate)) {
-      return myRestList[value.fullDate].map((rest: RestType, index: number) => (
+      const fullDateList = myRest.myRestList[value.fullDate]!
+      return fullDateList.map((rest: RestType, index: number) => (
         <RestBar rest={rest} key={index} onDetail={onDetail}/>
       ));
     }
@@ -133,8 +122,6 @@ const Calendar = () => {
 
   return (
     <>
-      {isLoading && <p>Loading...</p>}
-      {/*{error && <p>{error}</p>}*/}
       <section className="big-calendar">
         <div className="calendar__navi">
           <button
@@ -182,7 +169,7 @@ const Calendar = () => {
                           <span className="dateNum">{temp.dateNum}</span>
                           <span className="dateName">{temp.daysName}</span>
                         </div>
-                        {myRestList && showMyRestDay(temp)}
+                        {myRest?.myRestList && showMyRestDay(temp)}
                       </td>
                     );
                   })}

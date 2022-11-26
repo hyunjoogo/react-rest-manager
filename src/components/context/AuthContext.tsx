@@ -1,7 +1,7 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {getAuth, User} from "firebase/auth";
+import {User} from "firebase/auth";
 import {login, logout, onUserStateChange} from "../../api/firebase";
-import {UserState} from "../ui/navbar";
+import { UserState } from '../ui/navbar';
 
 export type Store = {
   user: UserState | null;

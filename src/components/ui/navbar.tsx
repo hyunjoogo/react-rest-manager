@@ -24,8 +24,8 @@ const Navbar = () => {
       </Link>
       <nav className="flex items-center gap-4 font-semibold">
         {!!user && <UserComponent user={user}/>}
-        {!user && <Button text="Login" onClick={login}/>}
-        {!!user && <Button text="Logout" onClick={logout}/>}
+        {!user && <Button onClick={login}>Login</Button>}
+        {!!user && <Button onClick={logout}>Logout</Button>}
       </nav>
     </header>
   );

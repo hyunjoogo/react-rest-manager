@@ -50,12 +50,12 @@ const adminUser = async (user: User | null) => {
     });
 };
 
-export async function getMyRestList() {
+export async function getMyRest() {
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
       if (snapshot.exists()) {
-        return snapshot.val().myRestList;
+        return snapshot.val();
       }
       return [];
     });
