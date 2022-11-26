@@ -2,14 +2,17 @@ import {toEndOfMonth, toEndOfPrevMonth, toStartOfMonth, toStartOfNextMonth, what
 import {changeDate} from "../utils/changeDate";
 import ONLY_REST from "../assets/json/only-rest-date.json";
 import {CalendarList} from "./mini-calendar";
+import REST_DATA from "../assets/json/rest-data.json";
+import {RestDataType} from "./Calendar";
 
 /**
  * 특정 월의 날짜를 넣으면 해당 월의 리스트를 주는 함수 (미니캘린더와 기본캘린더 같이 사용할 수 있을듯)
  * @param currentMonth {Date} 보여주려고 하는 월 입력
+ * @param isBasic {boolean} 기본캘린더 true일 때 공휴일 이름을 표시해줌
  * @return tempList 일-토 기준으로 전월 + 현재월 + 익월의 정보가 있는 리스트 리턴
  */
 
-export const makeCalendar = (currentMonth : Date) => {
+export const makeCalendar = (currentMonth : Date, isBasic = false) => {
   const dayList = ['일', '월', '화', '수', '목', '금', '토'];
   const todayInfo = {
     year: currentMonth.getFullYear(),
@@ -78,6 +81,15 @@ export const makeCalendar = (currentMonth : Date) => {
       isCurrentMonth: true,
       isHoliday: isHoliday,
     };
+
+    if (isBasic) {
+      const json: RestDataType = REST_DATA;
+      const thisYearHolidayJson = json[String(todayInfo.year)]!;
+
+      if (typeof thisYearHolidayJson[date] === "string") {
+        temp["daysName"] = thisYearHolidayJson[date];
+      }
+    }
 
     tempList.push(temp);
   }
