@@ -6,6 +6,7 @@ import RestBar from "./RestBar";
 import DialogManager from "../dialog/DialogManager";
 import DetailMyRest from "../pages/DetailMyRest";
 import {makeCalendar} from "./makeCalendar";
+import {MyRestType} from "./type/type";
 
 export type RestDataType = {
   [key: string]: {
@@ -23,17 +24,7 @@ export type RestType = {
 }
 
 type CalendarProps = {
-  myRest: {
-    myRestList: {
-      [key: string]: RestType[]
-    },
-    restRemainDay: {
-      [key: string]: {
-        [key: string]: number;
-      };
-    },
-    uid: string;
-  },
+  myRest: MyRestType
 }
 
 
@@ -102,7 +93,7 @@ const Calendar = ({myRest}: CalendarProps) => {
   const showMyRestDay = (value: CalendarList) => {
     const list = Object.keys(myRest.myRestList);
     if (list.includes(value.fullDate)) {
-      const fullDateList = myRest.myRestList[value.fullDate]!
+      const fullDateList = myRest.myRestList[value.fullDate]!;
       return fullDateList.map((rest: RestType, index: number) => (
         <RestBar rest={rest} key={index} onDetail={onDetail}/>
       ));
@@ -121,68 +112,67 @@ const Calendar = ({myRest}: CalendarProps) => {
 
 
   return (
-    <>
-      <section className="big-calendar">
-        <div className="calendar__navi">
-          <button
-            name="prev"
-            className="calendar__nav--previous p-2"
-            onClick={handleCurrentMonth}
-          >﹤
-          </button>
-          <p className="calendar__nav--month p-2" onClick={() => console.log(selectsDate)}>
-            {format(currentMonth, Format.YYYY_MM)}
-          </p>
-          <button
-            name="next"
-            className="calendar__nav--next p-2"
-            onClick={handleCurrentMonth}
-          >﹥
-          </button>
-        </div>
-        <table className="calendar__container">
-          <thead>
-          <tr>
-            <th className="dayofweek sunday">일</th>
-            <th className="dayofweek">월</th>
-            <th className="dayofweek">화</th>
-            <th className="dayofweek">수</th>
-            <th className="dayofweek">목</th>
-            <th className="dayofweek">금</th>
-            <th className="dayofweek">토</th>
-          </tr>
-          </thead>
-          <tbody>
-          {calendarList.map((_, index) => {
-            if (index % 7 === 0) {
-              return (
-                <tr key={index}>
-                  {[0, 1, 2, 3, 4, 5, 6].map((count, dayofweekNum) => {
-                    const temp = calendarList[index + count] as CalendarList;
-                    return (
-                      <td
-                        className={makeClassName(temp, dayofweekNum)}
-                        key={index + count}
-                        onClick={clickDay}
-                      >
-                        <div>
-                          <span className="dateNum">{temp.dateNum}</span>
-                          <span className="dateName">{temp.daysName}</span>
-                        </div>
-                        {myRest?.myRestList && showMyRestDay(temp)}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            } else {
-              return null;
-            }
-          })}
-          </tbody>
-        </table>
-      </section>
-    </>
+    <section className="big-calendar">
+      <div className="calendar__navi">
+        <button
+          name="prev"
+          className="calendar__nav--previous p-2"
+          onClick={handleCurrentMonth}
+        >﹤
+        </button>
+        <p className="calendar__nav--month p-2" onClick={() => console.log(selectsDate)}>
+          {format(currentMonth, Format.YYYY_MM)}
+        </p>
+        <button
+          name="next"
+          className="calendar__nav--next p-2"
+          onClick={handleCurrentMonth}
+        >﹥
+        </button>
+      </div>
+      <table className="calendar__container">
+        <thead>
+        <tr>
+          <th className="dayofweek sunday">일</th>
+          <th className="dayofweek">월</th>
+          <th className="dayofweek">화</th>
+          <th className="dayofweek">수</th>
+          <th className="dayofweek">목</th>
+          <th className="dayofweek">금</th>
+          <th className="dayofweek">토</th>
+        </tr>
+        </thead>
+        <tbody>
+        {calendarList.map((_, index) => {
+          if (index % 7 === 0) {
+            return (
+              <tr key={index}>
+                {[0, 1, 2, 3, 4, 5, 6].map((count, dayofweekNum) => {
+                  const temp = calendarList[index + count] as CalendarList;
+                  return (
+                    <td
+                      className={makeClassName(temp, dayofweekNum)}
+                      key={index + count}
+                      onClick={clickDay}
+                    >
+                      <div>
+                        <span className="dateNum">{temp.dateNum}</span>
+                        <span className="dateName">{temp.daysName}</span>
+                      </div>
+                      {myRest?.myRestList && showMyRestDay(temp)}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          } else {
+            return null;
+          }
+        })}
+        </tbody>
+      </table>
+    </section>
+
   )
     ;
 };

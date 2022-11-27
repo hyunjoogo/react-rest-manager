@@ -4,6 +4,7 @@ import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline';
 import {onUserStateChange} from "../api/firebase";
 import {User} from "@firebase/auth";
 import {Link} from 'react-router-dom';
+import MyRest from "./my-rest";
 
 // https://tailwindui.com/components/application-ui/application-shells/stacked
 
@@ -30,7 +31,6 @@ const LayoutStyleExample = () => {
   const [userState, setUserState] = useState<UserState | null>(null);
 
   useEffect(() => {
-
     onUserStateChange(setUserState);
   }, []);
 
@@ -172,17 +172,12 @@ const LayoutStyleExample = () => {
             </>
           )}
         </Disclosure>
-
-        <header className="bg-white shadow">
-          <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-          </div>
-        </header>
         <main>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             {/* Replace with your content */}
             <div className="px-4 py-6 sm:px-0">
-              <div className="h-96 rounded-lg border-4 border-dashed border-gray-200"/>
+              {/*<div className="h-96 rounded-lg border-4 border-dashed border-gray-200"/>*/}
+              <MyRest/>
             </div>
             {/* /End replace */}
           </div>

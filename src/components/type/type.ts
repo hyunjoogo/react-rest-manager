@@ -1,3 +1,5 @@
+import {RestType} from "../Calendar";
+
 export type DataType = {
   date: string;
   category: "takeoff" | "vacation" | "replace" | "", // 휴가유형
@@ -12,4 +14,17 @@ export type DataType = {
 export interface DialogProps {
   show: boolean;
   onClose: (result: string) => void;
+}
+
+
+export type MyRestType = {
+  myRestList: {
+    [key: string]: RestType[]
+  },
+  restRemainDay: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  },
+  uid: string;
 }

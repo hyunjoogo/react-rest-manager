@@ -23,7 +23,7 @@ export const RestBar = ({rest, onDetail}: RestBarProps) => {
       default:
         alert("잘못된 값입니다.");
     }
-    let useType = ""
+    let useType = "";
     switch (rest.useType) {
       case "tmo" :
         useType = "하루 종일";
@@ -37,7 +37,10 @@ export const RestBar = ({rest, onDetail}: RestBarProps) => {
       default:
         alert("잘못된 값입니다.");
     }
-    return <span>{category} : {useType}</span>
+    return <>
+      <span>{category}</span>
+      <span className="hidden sm:inline"> : {useType}</span>
+    </>;
   };
 
   return (

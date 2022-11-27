@@ -1,4 +1,5 @@
 @import "style.css";
+
 .calendar {
     width: 100%;
     border-top: 1px solid #444444;
@@ -7,7 +8,8 @@
 
 td {
     border: 1px solid #E5EAEE;
-    padding: 0.5rem;
+
+    @apply p-0 sm:p-2
 }
 
 th {
@@ -65,7 +67,7 @@ th {
 .calendar__container .dateName {
     font-size: 0.75rem;
     color: gray;
-    @apply mr-2
+    @apply mr-2 hidden sm:inline
 }
 
 .calendar__container .notCurrent {
@@ -97,9 +99,32 @@ th {
 .big-calendar .calendar__container tbody td .rest-content {
     background-color: #0D5CE0;
     color: white;
+    @apply text-center rounded-md cursor-pointer
 }
 
 
 .myRest-title {
+    @apply flex items-center justify-between
+}
+.myRest-title .remain-list{
+    @apply flex flex-wrap space-x-6
+}
 
+@media (max-width: 499px) {
+    .myRest-title .remain-list{
+        @apply space-x-2
+    }
+}
+
+.myRest-Content .big-calendar {
+    order: 1;
+}
+
+.myRest-Content .add-page {
+    order: 2;
+}
+
+.myRest-Content.add-mode {
+    grid-template-columns: 2fr 1fr;
+    @apply sm:grid
 }
