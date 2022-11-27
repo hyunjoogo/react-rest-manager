@@ -4,6 +4,7 @@ import AddPage from './add-page';
 import {useQuery} from "@tanstack/react-query";
 import {getMyRest} from "../api/firebase";
 import MyRestRemainDay from "../components/MyRestRemainDay";
+import Button from '../components/ui/Button';
 
 const MyRest = () => {
   const [addMode, setAddMode] = useState(false);
@@ -31,16 +32,15 @@ const MyRest = () => {
   return (
     <>
       <div className="myRest-title">
-        <MyRestRemainDay myRest={myRest}/>
-        <div className="flex mt-0 ml-4">
-          <button
-            type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            onClick={handleAddMode}
-          >
-            휴가 사용
-          </button>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+            나의 휴가
+          </h2>
+          <div className="flex mt-0 ml-4">
+            <Button type="button" onClick={handleAddMode}>휴가 사용</Button>
+          </div>
         </div>
+        <MyRestRemainDay myRest={myRest}/>
       </div>
       <div className={classNames(
         addMode ? "add-mode" : "",

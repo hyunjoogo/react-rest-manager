@@ -18,19 +18,14 @@ const MyRestRemainDay = ({myRest}: MyRestRemainDayProps) => {
     list.push({restName: "대체휴무", remainDay: replace.remainDay, total: replace.total});
   }
   return (
-    <div className="min-w-0 flex-1">
-      <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-        나의 휴가
-      </h2>
-      <div className="remain-list">
-        {list.map((type) => {
-          return (
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <strong>{type.restName}</strong> : {type.remainDay} / {type.total}
-            </div>
-          );
-        })}
-      </div>
+    <div className="remain-list">
+      {list.map((type, index) => {
+        return (
+          <div className="mt-2 flex items-center text-sm text-gray-500" key={index}>
+            <strong>{type.restName}</strong> : {type.remainDay} / {type.total}
+          </div>
+        );
+      })}
     </div>
   );
 };
