@@ -19,10 +19,12 @@ type SelectsDate = {
 
 
 type MiniCalendarProps = {
-  setFormData: React.Dispatch<React.SetStateAction<FormDate>>
+  formData: FormDate;
+  setFormData: React.Dispatch<React.SetStateAction<FormDate>>;
+  handleSelectedDay: () => void;
 }
 
-const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
+const MiniCalendar = ({formData, setFormData, handleSelectedDay}: MiniCalendarProps) => {
   // console.log(setFormData);
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
@@ -58,6 +60,12 @@ const MiniCalendar = ({setFormData}: MiniCalendarProps) => {
   };
 
   const clickDay = (e: React.MouseEvent) => {
+    if (formData.category === "" || formData.useType === "") {
+      return alert('휴가 유형 또는 휴가 사용 유형을 선택하세요');
+    }
+    handleSelectedDay()
+
+
     const target = e.target as Element;
     const targetDate = target.classList[0] as string;
 

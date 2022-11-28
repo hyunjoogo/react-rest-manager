@@ -46,7 +46,7 @@ const MyRest = () => {
         addMode ? "add-mode" : "",
         "myRest-Content"
       )}>
-        {addMode && <AddPage/>}
+        {addMode && <AddPage myRest={myRest}/>}
         <Calendar myRest={myRest}/>
       </div>
     </>
