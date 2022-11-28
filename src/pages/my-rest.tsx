@@ -26,7 +26,7 @@ const MyRest = () => {
     return [class1, class2].filter(Boolean).join(' ');
   }
 
-  console.log(myRest.restRemainDay);
+  console.log(myRest);
 
 
   return (
@@ -40,13 +40,13 @@ const MyRest = () => {
             <Button type="button" onClick={handleAddMode}>휴가 사용</Button>
           </div>
         </div>
-        <MyRestRemainDay myRest={myRest}/>
+        {/*<MyRestRemainDay myRest={myRest}/>*/}
       </div>
       <div className={classNames(
         addMode ? "add-mode" : "",
         "myRest-Content"
       )}>
-        {addMode && <AddPage myRest={myRest}/>}
+        {addMode && <AddPage/>}
         <Calendar myRest={myRest}/>
       </div>
     </>

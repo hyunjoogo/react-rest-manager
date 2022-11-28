@@ -2,6 +2,7 @@ import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from "firebase/auth";
 import {get, getDatabase, ref} from "firebase/database";
 import {User} from "@firebase/auth";
+import {MyRestType} from "../components/type/type";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -50,7 +51,7 @@ const adminUser = async (user: User | null) => {
     });
 };
 
-export async function getMyRest() {
+export const getMyRest = async ()=> {
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
@@ -59,5 +60,5 @@ export async function getMyRest() {
       }
       return [];
     });
-}
+};
 

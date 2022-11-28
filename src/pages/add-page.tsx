@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
-import {MyRestType} from "../components/type/type";
+import {DataType, MyRestType} from "../components/type/type";
 import {translateNumberType} from "../utils/translateStringType";
+import {useQuery} from "@tanstack/react-query";
 
 
 export interface FormDate {
@@ -29,73 +30,66 @@ type AddPageProps = {
 }
 
 type SelectedResultType = {
-  date: string;
-  category: string;
-  useType: string;
+  [key: string]: DataType
 }
 
-const AddPage = ({myRest}: AddPageProps) => {
-
-  const [formData, setFormData] = useState<FormDate>({
+const AddPage = () => {
+// 현재 폼에 선택되어 있는 데이터 모음
+  const [selectedFormData, setSelectedFormData] = useState<FormDate>({
     category: "",
     useType: "",
     date: [],
     publicReason: "",
     privateReason: ""
   });
-  const [tempRestRemainDay, setTempRestRemainDay] = useState(myRest.restRemainDay);
+  // 서버에서 가지고 온 잔여일 데이터
+  const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
+
+  useEffect(()=>{
+    if (isSuccess) {
+      setTempRestRemainDay(myRest.restRemainDay)
+    }
+  },[])
+
+  const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
+  // 서버에 올릴 리스트
   const [selectedResult, setSelectedResult] = useState<SelectedResultType[]>([]);
-
-
-  useEffect(() => {
-
-  }, []);
-
 
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
     const name = target.name;
     if (name === "category") {
-      setFormData(prev => ({...prev, [name]: target.value, useType: ""}));
+      setSelectedFormData(prev => ({...prev, [name]: target.value, useType: ""}));
     } else {
-      setFormData(prev => ({...prev, [name]: target.value}));
+      setSelectedFormData(prev => ({...prev, [name]: target.value}));
     }
   };
 
   const handleTextareaValue = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const target = e.target;
     const name = target.name;
-    setFormData(prev => ({...prev, [name]: target.value}));
+    setSelectedFormData(prev => ({...prev, [name]: target.value}));
   };
 
   const handleSelectedDay = () => {
+    // 현재 선택된 휴가유형의 잔여일수를 서버에서 가지고 오고
+    let selectedCategoryRemainDay = tempRestRemainDay[selectedFormData.category]!.remainDay as number;
 
-    // const sortedSelectedList = formData.date.sort((a, b) => Number(a) - Number(b));
-    // console.log(sortedSelectedList);
-
-    // 선택된 휴가유형의 잔여일수를 서버에서 가지고 오고
-    let selectedCategoryRemainDay = tempRestRemainDay[formData.category]!.remainDay as number;
-
-    let daysOfUse = translateNumberType(formData.useType) as number;
+    let daysOfUse = translateNumberType(selectedFormData.useType) as number;
     console.log(selectedCategoryRemainDay, daysOfUse);
     // 잔여일수 - 사용유형일수를 뺀다.
 
-    if (selectedCategoryRemainDay - daysOfUse < 12) {
-      alert('잔여일수가 없습니다. 확인해주세요!')
-
-    }
-
-
+    return selectedCategoryRemainDay - daysOfUse >= 12;
     // 마이너스일 경우 세이브 버튼 비활성화
     // 빨간색으로 표현하기
-
-
   };
 
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    console.log(selectedFormData);
+
+    // 날짜 : 정보 형식으로 firebase 올리기
   };
   return (
 
@@ -111,7 +105,7 @@ const AddPage = ({myRest}: AddPageProps) => {
               id="category"
               name="category"
               onChange={handleSelectMenuValue}
-              value={formData.category}
+              value={selectedFormData.category}
               className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
             >
               <option value="" disabled>선택하세요</option>
@@ -129,8 +123,8 @@ const AddPage = ({myRest}: AddPageProps) => {
               id="useType"
               name="useType"
               onChange={handleSelectMenuValue}
-              disabled={formData.category === ""}
-              value={formData.useType}
+              disabled={selectedFormData.category === ""}
+              value={selectedFormData.useType}
               className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
             >
               <option value="" disabled>선택하세요</option>
@@ -139,16 +133,16 @@ const AddPage = ({myRest}: AddPageProps) => {
               <option value="tdo">오후 반차</option>
             </select>
           </div>
-          <div className="col-span-6 sm:col-span-3">
+          <div className="col-span-6 sm:col-span-3 relative">
             <label htmlFor="" className="block text-sm font-medium text-gray-700">
               휴가 일정 선택
             </label>
-            {/* 유형, 사용유형이 선택되어 있지 않으면 안됨 */}
-            <MiniCalendar formData={formData} setFormData={setFormData} handleSelectedDay={handleSelectedDay}/>
+            <MiniCalendar selectedFormData={selectedFormData} setSelectedFormData={setSelectedFormData}
+                          handleSelectedDay={handleSelectedDay}/>
           </div>
-          {formData.date.length > 0 &&
+          {selectedFormData.date.length > 0 &&
             <div className="col-span-6 sm:col-span-3 border">
-
+              {/* 일정 선택 결과 보여주기 */}
             </div>
           }
           <div className="col-span-6 sm:col-span-3">
@@ -162,7 +156,7 @@ const AddPage = ({myRest}: AddPageProps) => {
                         rows={3}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="공개되는 휴가 사유를 적으세요."
-                        value={formData.publicReason}
+                        value={selectedFormData.publicReason}
                         onChange={handleTextareaValue}
                       />
             </div>
@@ -178,7 +172,7 @@ const AddPage = ({myRest}: AddPageProps) => {
                         rows={3}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="이 메모는 비공개입니다. "
-                        value={formData.privateReason}
+                        value={selectedFormData.privateReason}
                         onChange={handleTextareaValue}
                       />
             </div>

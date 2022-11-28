@@ -19,12 +19,12 @@ type SelectsDate = {
 
 
 type MiniCalendarProps = {
-  formData: FormDate;
-  setFormData: React.Dispatch<React.SetStateAction<FormDate>>;
+  selectedFormData: FormDate;
+  setSelectedFormData: React.Dispatch<React.SetStateAction<FormDate>>;
   handleSelectedDay: () => void;
 }
 
-const MiniCalendar = ({formData, setFormData, handleSelectedDay}: MiniCalendarProps) => {
+const MiniCalendar = ({selectedFormData, handleSelectedDay}: MiniCalendarProps) => {
   // console.log(setFormData);
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
@@ -60,26 +60,45 @@ const MiniCalendar = ({formData, setFormData, handleSelectedDay}: MiniCalendarPr
   };
 
   const clickDay = (e: React.MouseEvent) => {
-    if (formData.category === "" || formData.useType === "") {
+    // 0. 유형선택은 필수
+    if (selectedFormData.category === "" || selectedFormData.useType === "") {
       return alert('휴가 유형 또는 휴가 사용 유형을 선택하세요');
     }
-    handleSelectedDay()
+    const {category, useType} = selectedFormData;
 
+// 선택완료시 날짜를 선택하는 순간
+    // 1. 계산부터
+    // - 휴가 유형, 사용 유형 확인
+    // - 0보다 작은 큰지 확인하여 return t/f
 
+    // 2.1 true이면 선택된 리스트에 추가
+    // - 리스트를 map 돌면서 카드형식으로 뿌려주기
+    // 2.2 false이면 알라트 후 함수 종료
+
+    // 3. 추가시 2.1 다시
+    // 4. 삭제시 2.1 다시
+
+    console.log(handleSelectedDay);
     const target = e.target as Element;
     const targetDate = target.classList[0] as string;
 
     if (target.classList.contains('holiday')) {
       return;
     }
-    target.classList.toggle('selected');
 
-    const newSelectsDate = selectsDate.includes(targetDate)
-      ? selectsDate.filter(date => date !== targetDate)
-      : [...selectsDate, targetDate];
 
-    setFormData(prev => ({...prev, date: newSelectsDate}));
+    // 선택이 가능한 친구인가?
+    // if (handleSelectedDay()) {
+    //
+    // }
+
+
+      const newSelectsDate = selectsDate.includes(targetDate)
+        ? selectsDate.filter(date => date !== targetDate)
+        : [...selectsDate, targetDate];
     setSelectDate(newSelectsDate);
+
+    target.classList.toggle('selected');
   };
 
   const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
