@@ -1,8 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {ReactNode, useCallback, useEffect, useState} from 'react';
 import {Format, format, nextMonth, prevMonth} from "../utils/DateUtil";
 import {classStr} from "../utils/classStr";
 import {FormDate} from "../pages/add-page";
 import {makeCalendar} from "./makeCalendar";
+import {useQuery} from "@tanstack/react-query";
+import {MyRestType} from "./type/type";
+import {translateNumberType} from "../utils/translateType";
 
 export type CalendarList = {
   dateNum: number,
@@ -17,20 +20,35 @@ type SelectsDate = {
   endDt: string | null
 }
 
+type SelectedDateTypes = {
+  [key: string]: {
+    category: "takeoff" | "vacation" | "replace",
+    useType: "tmo" | "tao" | "tdo",
+    deduction: number,
+  }
+}
 
 type MiniCalendarProps = {
   selectedFormData: FormDate;
   setSelectedFormData: React.Dispatch<React.SetStateAction<FormDate>>;
-  handleSelectedDay: () => void;
+  handleSelectedDay: (newSelectsDate: string[]) => void;
 }
 
-const MiniCalendar = ({selectedFormData, handleSelectedDay}: MiniCalendarProps) => {
-  // console.log(setFormData);
+const MiniCalendar = ({selectedFormData}: MiniCalendarProps) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
-
   const [selectsDate, setSelectDate] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<SelectedDateTypes>({});
+  const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
+
+  const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setTempRestRemainDay(myRest.restRemainDay);
+    }
+  }, []);
 
   useEffect(() => {
     const newCalendar = makeCalendar(currentMonth);
@@ -60,6 +78,13 @@ const MiniCalendar = ({selectedFormData, handleSelectedDay}: MiniCalendarProps) 
   };
 
   const clickDay = (e: React.MouseEvent) => {
+    const target = e.target as Element;
+    const targetDate = target.classList[0] as string;
+
+    if (target.classList.contains('holiday')) {
+      return;
+    }
+
     // 0. 유형선택은 필수
     if (selectedFormData.category === "" || selectedFormData.useType === "") {
       return alert('휴가 유형 또는 휴가 사용 유형을 선택하세요');
@@ -70,34 +95,26 @@ const MiniCalendar = ({selectedFormData, handleSelectedDay}: MiniCalendarProps) 
     // 1. 계산부터
     // - 휴가 유형, 사용 유형 확인
     // - 0보다 작은 큰지 확인하여 return t/f
-
-    // 2.1 true이면 선택된 리스트에 추가
-    // - 리스트를 map 돌면서 카드형식으로 뿌려주기
-    // 2.2 false이면 알라트 후 함수 종료
-
-    // 3. 추가시 2.1 다시
-    // 4. 삭제시 2.1 다시
-
-    console.log(handleSelectedDay);
-    const target = e.target as Element;
-    const targetDate = target.classList[0] as string;
-
-    if (target.classList.contains('holiday')) {
-      return;
+    const {remainDay} = tempRestRemainDay[category]!;
+    if (remainDay! - translateNumberType(useType)! < 0) {
+      return alert('해당 휴가 유형의 사용일수가 부족합니다.');
     }
 
-
-    // 선택이 가능한 친구인가?
-    // if (handleSelectedDay()) {
-    //
-    // }
-
-
-      const newSelectsDate = selectsDate.includes(targetDate)
-        ? selectsDate.filter(date => date !== targetDate)
-        : [...selectsDate, targetDate];
-    setSelectDate(newSelectsDate);
-
+    setSelectedDate(prev => {
+      if (Object.keys(prev).includes(targetDate)) {
+        const temp = {...prev};
+        delete temp[targetDate];
+        return temp;
+      } else {
+        return {
+          ...prev, [targetDate]: {
+            category: category,
+            useType: useType,
+            deduction: translateNumberType(useType)!
+          }
+        };
+      }
+    });
     target.classList.toggle('selected');
   };
 

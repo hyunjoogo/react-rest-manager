@@ -2,7 +2,7 @@ import React from 'react';
 import WindowDialog from "../dialog/WindowDialog";
 import {DialogProps} from "../components/type/type";
 import {RestType} from "../components/Calendar";
-import {translateStringType} from "../utils/translateStringType";
+import {translateType} from "../utils/translateType";
 
 interface DetailMyRestProps extends DialogProps {
   // data를 받아올 경우 추가할 것
@@ -12,8 +12,8 @@ interface DetailMyRestProps extends DialogProps {
 const DetailMyRest = (props: DetailMyRestProps) => {
   const {restData, onClose} = props;
   const list = [
-    {labelName: "유형", value: translateStringType(restData.category)},
-    {labelName: "사용 유형", value: translateStringType(restData.useType)},
+    {labelName: "유형", value: translateType(restData.category)},
+    {labelName: "사용 유형", value: translateType(restData.useType)},
     {labelName: "사유", value: restData.privateReason},
     {labelName: "개인 메모", value: restData.publicReason},
   ];

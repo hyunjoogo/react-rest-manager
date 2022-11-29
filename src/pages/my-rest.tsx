@@ -25,10 +25,6 @@ const MyRest = () => {
   function classNames(class1: string, class2: string) {
     return [class1, class2].filter(Boolean).join(' ');
   }
-
-  console.log(myRest);
-
-
   return (
     <>
       <div className="myRest-title">
@@ -40,7 +36,7 @@ const MyRest = () => {
             <Button type="button" onClick={handleAddMode}>휴가 사용</Button>
           </div>
         </div>
-        {/*<MyRestRemainDay myRest={myRest}/>*/}
+        <MyRestRemainDay myRest={myRest}/>
       </div>
       <div className={classNames(
         addMode ? "add-mode" : "",

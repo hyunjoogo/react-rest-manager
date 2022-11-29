@@ -2,7 +2,7 @@ interface TranslateType {
   (typeEn: string): string;
 }
 
-export const translateStringType: TranslateType = (typeEn) => {
+export const translateType: TranslateType = (typeEn) => {
   let typeKo = "";
   switch (typeEn) {
     case "takeoff" :
@@ -33,11 +33,12 @@ export const translateNumberType = (useType: string) => {
   switch (useType) {
     case "tmo" :
       return 1;
+      break;
     case "tao":
       return 0.5;
+      break;
     case "tdo":
       return 0.5;
-    default:
-      return console.error("잘못된 값입니다.")
+      break;
   }
 };

@@ -2,28 +2,19 @@ import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
 import {DataType, MyRestType} from "../components/type/type";
-import {translateNumberType} from "../utils/translateStringType";
+import {translateNumberType} from "../utils/translateType";
 import {useQuery} from "@tanstack/react-query";
 
 
-export interface FormDate {
-  category: string;
-  useType: string;
+export type FormDate = {
+  category: "takeoff" | "vacation" | "replace" | "";
+  useType: "tmo" | "tao" | "tdo" | "";
   date: string[];
   publicReason: string;
   privateReason: string;
 }
 
 export type DateType = Date | null
-
-
-// 1. 휴가 사용유형이 오전반차, 오후반차일 경우
-// => 날짜 선택 => 하루만 선택
-
-// 2. 휴가 사용유형이 하루 종일일 경우
-// => 시작날짜, 종료날짜 선택
-// => 같은 날일 경우 => 하루사용으로 간주
-// => 다른 날일 경우 => 종료 - 시작 일수 사용으로 간주
 
 type AddPageProps = {
   myRest: MyRestType
@@ -45,11 +36,11 @@ const AddPage = () => {
   // 서버에서 가지고 온 잔여일 데이터
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (isSuccess) {
-      setTempRestRemainDay(myRest.restRemainDay)
+      setTempRestRemainDay(myRest.restRemainDay);
     }
-  },[])
+  }, []);
 
   const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
   // 서버에 올릴 리스트
@@ -58,8 +49,9 @@ const AddPage = () => {
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
     const name = target.name;
+    const value = target.value as "takeoff" | "vacation" | "replace" | "";
     if (name === "category") {
-      setSelectedFormData(prev => ({...prev, [name]: target.value, useType: ""}));
+      setSelectedFormData(prev => ({...prev, [name]: value, useType: ""}));
     } else {
       setSelectedFormData(prev => ({...prev, [name]: target.value}));
     }
@@ -71,15 +63,11 @@ const AddPage = () => {
     setSelectedFormData(prev => ({...prev, [name]: target.value}));
   };
 
-  const handleSelectedDay = () => {
+  const handleSelectedDay = (newSelectsDate: string[]) => {
     // 현재 선택된 휴가유형의 잔여일수를 서버에서 가지고 오고
-    let selectedCategoryRemainDay = tempRestRemainDay[selectedFormData.category]!.remainDay as number;
+    console.log(selectedResult, newSelectsDate);
 
-    let daysOfUse = translateNumberType(selectedFormData.useType) as number;
-    console.log(selectedCategoryRemainDay, daysOfUse);
-    // 잔여일수 - 사용유형일수를 뺀다.
 
-    return selectedCategoryRemainDay - daysOfUse >= 12;
     // 마이너스일 경우 세이브 버튼 비활성화
     // 빨간색으로 표현하기
   };
