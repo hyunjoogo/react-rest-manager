@@ -24,6 +24,14 @@ type SelectedResultType = {
   [key: string]: DataType
 }
 
+export type SelectedDateTypes = {
+  [key: string]: {
+    category: "takeoff" | "vacation" | "replace",
+    useType: "tmo" | "tao" | "tdo",
+    deduction: number,
+  }
+}
+
 const AddPage = () => {
 // 현재 폼에 선택되어 있는 데이터 모음
   const [selectedFormData, setSelectedFormData] = useState<FormDate>({
@@ -35,6 +43,10 @@ const AddPage = () => {
   });
   // 서버에서 가지고 온 잔여일 데이터
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
+  const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
+  const [selectedResult, setSelectedResult] = useState<SelectedResultType[]>([]);   // 서버에 올릴 리스트
+  const [selectedDate, setSelectedDate] = useState<SelectedDateTypes>({});
+
 
   useEffect(() => {
     if (isSuccess) {
@@ -42,9 +54,6 @@ const AddPage = () => {
     }
   }, []);
 
-  const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
-  // 서버에 올릴 리스트
-  const [selectedResult, setSelectedResult] = useState<SelectedResultType[]>([]);
 
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
@@ -63,13 +72,10 @@ const AddPage = () => {
     setSelectedFormData(prev => ({...prev, [name]: target.value}));
   };
 
-  const handleSelectedDay = (newSelectsDate: string[]) => {
-    // 현재 선택된 휴가유형의 잔여일수를 서버에서 가지고 오고
-    console.log(selectedResult, newSelectsDate);
+  const handleSelectedDay = () => {
+    console.log(selectedDate);
 
-
-    // 마이너스일 경우 세이브 버튼 비활성화
-    // 빨간색으로 표현하기
+    return <></>
   };
 
 
@@ -126,11 +132,14 @@ const AddPage = () => {
               휴가 일정 선택
             </label>
             <MiniCalendar selectedFormData={selectedFormData} setSelectedFormData={setSelectedFormData}
+                          selectedDate={selectedDate}
+                          setSelectedDate={setSelectedDate}
                           handleSelectedDay={handleSelectedDay}/>
           </div>
           {selectedFormData.date.length > 0 &&
             <div className="col-span-6 sm:col-span-3 border">
               {/* 일정 선택 결과 보여주기 */}
+              {handleSelectedDay()}
             </div>
           }
           <div className="col-span-6 sm:col-span-3">

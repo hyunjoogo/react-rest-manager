@@ -1,7 +1,7 @@
 import React, {ReactNode, useCallback, useEffect, useState} from 'react';
 import {Format, format, nextMonth, prevMonth} from "../utils/DateUtil";
 import {classStr} from "../utils/classStr";
-import {FormDate} from "../pages/add-page";
+import {FormDate, SelectedDateTypes} from "../pages/add-page";
 import {makeCalendar} from "./makeCalendar";
 import {useQuery} from "@tanstack/react-query";
 import {MyRestType} from "./type/type";
@@ -20,26 +20,22 @@ type SelectsDate = {
   endDt: string | null
 }
 
-type SelectedDateTypes = {
-  [key: string]: {
-    category: "takeoff" | "vacation" | "replace",
-    useType: "tmo" | "tao" | "tdo",
-    deduction: number,
-  }
-}
+
 
 type MiniCalendarProps = {
   selectedFormData: FormDate;
   setSelectedFormData: React.Dispatch<React.SetStateAction<FormDate>>;
   handleSelectedDay: (newSelectsDate: string[]) => void;
+  selectedDate : SelectedDateTypes;
+  setSelectedDate : React.Dispatch<React.SetStateAction<SelectedDateTypes>>;
+
 }
 
-const MiniCalendar = ({selectedFormData}: MiniCalendarProps) => {
+const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCalendarProps) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
   const [calendarList, setCalendarList] = useState<CalendarList[]>([]);
-  const [selectsDate, setSelectDate] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<SelectedDateTypes>({});
+  const [selectsDate, setSelectDate] = useState<string[]>([]);  ////  ????
   const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
 
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
@@ -89,33 +85,63 @@ const MiniCalendar = ({selectedFormData}: MiniCalendarProps) => {
     if (selectedFormData.category === "" || selectedFormData.useType === "") {
       return alert('휴가 유형 또는 휴가 사용 유형을 선택하세요');
     }
-    const {category, useType} = selectedFormData;
 
-// 선택완료시 날짜를 선택하는 순간
-    // 1. 계산부터
-    // - 휴가 유형, 사용 유형 확인
-    // - 0보다 작은 큰지 확인하여 return t/f
-    const {remainDay} = tempRestRemainDay[category]!;
-    if (remainDay! - translateNumberType(useType)! < 0) {
-      return alert('해당 휴가 유형의 사용일수가 부족합니다.');
-    }
+    // 1. 해당날짜가 이미 선택되어 있는지 없는지 확인
 
-    setSelectedDate(prev => {
-      if (Object.keys(prev).includes(targetDate)) {
+
+    if (Object.keys(selectedDate).includes(targetDate)) {
+      // 이미 눌러진 리스트에서 해당 날짜의 정보를 가지고 와서 다시 되돌리기
+      const {category, deduction} = selectedDate[targetDate]!;
+      setTempRestRemainDay(prev => {
+        const {remainDay} = prev[category]!;
+        return {
+          ...prev, [category]: {
+            ...prev[category],
+            remainDay: remainDay! + deduction
+          }
+        };
+      });
+
+      setSelectedDate(prev => {
         const temp = {...prev};
         delete temp[targetDate];
         return temp;
-      } else {
+      });
+    } else {
+      // 1. 계산부터
+      // - 휴가 유형, 사용 유형 확인
+      // - 0보다 작은 큰지 확인하여 return t/f
+
+      const {category, useType} = selectedFormData;
+      const {remainDay} = tempRestRemainDay[category]!;
+
+      if (remainDay! - translateNumberType(useType)! < 0) {
+        return alert('해당 휴가 유형의 사용일수가 부족합니다.');
+      }
+
+      setTempRestRemainDay(prev => {
+        // 해당 카테고리의 remainDay를 사용유형만큼 빼주기
         return {
-          ...prev, [targetDate]: {
-            category: category,
-            useType: useType,
-            deduction: translateNumberType(useType)!
+          ...prev, [category]: {
+            ...prev[category],
+            remainDay: remainDay! - translateNumberType(useType)!,
           }
         };
-      }
-    });
+      });
+      // 선택된 Date 변경해주기
+      setSelectedDate(prev => ({
+        ...prev, [targetDate]: {
+          category: category,
+          useType: useType,
+          deduction: translateNumberType(useType)!
+        }
+      }));
+    }
+
+
     target.classList.toggle('selected');
+
+
   };
 
   const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
