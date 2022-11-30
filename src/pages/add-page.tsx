@@ -94,33 +94,30 @@ const AddPage = () => {
 
 
   const onSubmit = async (e: React.FormEvent) => {
-
     e.preventDefault();
+    const myRestList: MyRestListType = {};
+    Object.keys(selectedDate).forEach((value) => {
+      const temp = selectedDate[value as keyof SelectedDateTypes]!;
+      const data = {
+        "category": temp.category,
+        "createDt": "",
+        "date": insertAtInString(value),
+        "deduction": temp.deduction,
+        "privateReason": selectedFormData.privateReason,
+        "publicReason": selectedFormData.publicReason,
+        "useType": temp.useType,
+      };
 
-
-    // const myRestList: MyRestListType = {};
-    // Object.keys(selectedDate).forEach((value) => {
-    //   const temp = selectedDate[value as keyof SelectedDateTypes]!;
-    //   const data = {
-    //     "category": temp.category,
-    //     "createDt": "",
-    //     "date": insertAtInString(value),
-    //     "deduction": temp.deduction,
-    //     "privateReason": selectedFormData.privateReason,
-    //     "publicReason": selectedFormData.publicReason,
-    //     "useType": temp.useType,
-    //   };
-    //
-    //   if (Object.keys(myRest!.myRestList).includes(value)) {
-    //     const target = [...myRest!.myRestList[value]!, data];
-    //     myRestList[value] = target;
-    //   } else {
-    //     myRestList[value] = [data];
-    //   }
-    //   console.log(myRestList);
-    // });
-    // await writeMyRest(myRestList);
-
+      if (Object.keys(myRest!.myRestList).includes(value)) {
+        const target = [...myRest!.myRestList[value]!, data];
+        myRestList[value] = target;
+      } else {
+        myRestList[value] = [data];
+      }
+      console.log(myRestList);
+    });
+    await writeMyRest(myRestList);
+// TODO 새로 리패치 시킬 것
   };
 
   const checkDisabled = () => {

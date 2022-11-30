@@ -52,6 +52,7 @@ const adminUser = async (user: User | null) => {
 };
 
 export const getMyRest = async () => {
+  // TODO userUid 파라미터로 받아오기
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
@@ -63,45 +64,10 @@ export const getMyRest = async () => {
 };
 
 export const writeMyRest = async (data: MyRestListType) => {
+  // TODO userUid 파라미터로 받아오기
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
 
-  // 기존데이터가 있는지 없는지 확인해야해
-  console.log(data);
-
-  const postData = {
-    "20221108": [
-      {
-        "category": "takeoff",
-        "createDt" : "",
-        "date" : "2002-11-08",
-        "deduction": 1,
-        "privateReason" : "개인메모2",
-        "publicReaston" : "공적내용",
-        "useType": "tmo",
-      },
-    ],
-    "20221109": [
-      {
-        "category": "takeoff",
-        "createDt" : "",
-        "date" : "2002-11-09",
-        "deduction": 1,
-        "privateReason" : "개인메모",
-        "publicReaston" : "공적내용",
-        "useType": "tmo",
-      },
-    ]
-  }
-
-  const updates = {};
-  // @ts-ignore
-  updates[`user/${userUid}/myRestList`] = data;
-
-
+  // TODO 해당 유저의 restRemainDay 업데이트 하기
   return update(ref(database, `user/${userUid}/myRestList`), data);
-
-  // return update(ref(database, `users/${userUid}`), {
-  //   user: "test"
-  // });
 };
 
