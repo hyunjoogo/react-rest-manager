@@ -5,7 +5,7 @@ import {DataType, MyRestListType, MyRestType} from "../components/type/type";
 import {translateNumberType, translateType} from "../utils/translateType";
 import {useQuery} from "@tanstack/react-query";
 import {insertAtInString} from "../utils/changeDate";
-import {writeMyRest} from "../api/firebase";
+import {sortMyRest, writeMyRest} from "../api/firebase";
 import Button from '../components/ui/Button';
 
 
@@ -114,14 +114,16 @@ const AddPage = () => {
       } else {
         myRestList[value] = [data];
       }
-      console.log(myRestList);
+
     });
     await writeMyRest(myRestList);
+    await sortMyRest(selectedDate);
+
+
 // TODO 새로 리패치 시킬 것
   };
 
   const checkDisabled = () => {
-    console.log(selectedFormData);
     const validation = Object.keys(selectedFormData).filter(key => {
       const temp = selectedFormData[key as keyof FormDate]!;
       if (key === "privateReason") {

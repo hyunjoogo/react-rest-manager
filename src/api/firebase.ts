@@ -1,8 +1,10 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from "firebase/auth";
-import {get, getDatabase, ref, set, push, update, child} from "firebase/database";
+import {get, getDatabase, ref, set, push, update, child, query, orderByChild} from "firebase/database";
 import {User} from "@firebase/auth";
 import {MyRestListType, MyRestType} from "../components/type/type";
+import {limitToFirst} from "@firebase/database";
+import {SelectedDateTypes} from "../pages/add-page";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -34,7 +36,7 @@ export const onUserStateChange = (callback: any) => {
   });
 };
 
-
+// TODO onValue로 하는 방법 알아보기
 const adminUser = async (user: User | null) => {
   // 2. 사용자가 어드민 권한을 가지고 있는지 확인!
   // 3. {...user, isAdmin : true/false}
@@ -51,6 +53,7 @@ const adminUser = async (user: User | null) => {
     });
 };
 
+
 export const getMyRest = async () => {
   // TODO userUid 파라미터로 받아오기
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
@@ -66,8 +69,23 @@ export const getMyRest = async () => {
 export const writeMyRest = async (data: MyRestListType) => {
   // TODO userUid 파라미터로 받아오기
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
-
-  // TODO 해당 유저의 restRemainDay 업데이트 하기
   return update(ref(database, `user/${userUid}/myRestList`), data);
 };
 
+export const sortMyRest = async (selectedDate: SelectedDateTypes) => {
+  const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
+  get(ref(database, `user/${userUid}/restRemainDay`))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.val();
+      }
+      return [];
+    }).then(result => {
+    const temp = {...result};
+    Object.keys(selectedDate).forEach(value => {
+      const day = selectedDate[value as keyof SelectedDateTypes]!;
+      temp[day.category].remainDay -= day.deduction;
+    });
+    update(ref(database, `user/${userUid}/restRemainDay`), temp);
+  });
+};
