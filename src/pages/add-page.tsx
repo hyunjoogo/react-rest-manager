@@ -2,8 +2,11 @@ import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
 import {DataType, MyRestType} from "../components/type/type";
-import {translateNumberType} from "../utils/translateType";
+import {translateNumberType, translateType} from "../utils/translateType";
 import {useQuery} from "@tanstack/react-query";
+import WillUseRest from "../components/WillUseRest";
+import {format} from "../utils/DateUtil";
+import {insertAtInString} from "../utils/changeDate";
 
 
 export type FormDate = {
@@ -73,16 +76,40 @@ const AddPage = () => {
   };
 
   const handleSelectedDay = () => {
-    console.log(selectedDate);
+    const list = Object.keys(selectedDate);
 
-    return <></>
+    if (list.length === 0) {
+      return <></>;
+    }
+
+
+    let tempRemainDay = {
+      takeoff: myRest!.restRemainDay['takeoff']!.remainDay,
+      vacation: myRest!.restRemainDay['vacation']!.remainDay,
+      replace: myRest!.restRemainDay['replace']!.remainDay,
+    };
+    const node: JSX.Element[] = [];
+    list.forEach((date, index) => {
+      const {category, useType} = selectedDate[date]!;
+      console.table(tempRemainDay);
+
+
+      node.push(
+        <div key={index}>
+          {translateType(category)} ({insertAtInString(date)}) : {translateType(useType)}
+          {tempRemainDay[category]!} ➡️ {tempRemainDay[category]! - translateNumberType(useType)!}
+        </div>
+      );
+      tempRemainDay[category]! -= translateNumberType(useType)!;
+      console.table(tempRemainDay);
+    });
+    return node;
   };
 
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(selectedFormData);
-
     // 날짜 : 정보 형식으로 firebase 올리기
   };
   return (
@@ -136,12 +163,10 @@ const AddPage = () => {
                           setSelectedDate={setSelectedDate}
                           handleSelectedDay={handleSelectedDay}/>
           </div>
-          {selectedFormData.date.length > 0 &&
-            <div className="col-span-6 sm:col-span-3 border">
-              {/* 일정 선택 결과 보여주기 */}
-              {handleSelectedDay()}
-            </div>
-          }
+          <div className="col-span-6 sm:col-span-3 border">
+            {/* 일정 선택 결과 보여주기 */}
+            {handleSelectedDay()}
+          </div>
           <div className="col-span-6 sm:col-span-3">
             <label htmlFor="publicReason" className="block text-sm font-medium text-gray-700">
               휴가 사유

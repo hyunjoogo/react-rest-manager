@@ -87,8 +87,6 @@ const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCal
     }
 
     // 1. 해당날짜가 이미 선택되어 있는지 없는지 확인
-
-
     if (Object.keys(selectedDate).includes(targetDate)) {
       // 이미 눌러진 리스트에서 해당 날짜의 정보를 가지고 와서 다시 되돌리기
       const {category, deduction} = selectedDate[targetDate]!;
@@ -133,15 +131,11 @@ const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCal
         ...prev, [targetDate]: {
           category: category,
           useType: useType,
-          deduction: translateNumberType(useType)!
+          deduction: translateNumberType(useType)!,
         }
       }));
     }
-
-
     target.classList.toggle('selected');
-
-
   };
 
   const handleCurrentMonth = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
