@@ -1,18 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
-import {DataType, MyRestType} from "../components/type/type";
+import {DataType, MyRestListType, MyRestType} from "../components/type/type";
 import {translateNumberType, translateType} from "../utils/translateType";
 import {useQuery} from "@tanstack/react-query";
-import WillUseRest from "../components/WillUseRest";
-import {format} from "../utils/DateUtil";
 import {insertAtInString} from "../utils/changeDate";
+import {writeMyRest} from "../api/firebase";
+import Button from '../components/ui/Button';
 
 
 export type FormDate = {
   category: "takeoff" | "vacation" | "replace" | "";
   useType: "tmo" | "tao" | "tdo" | "";
-  date: string[];
   publicReason: string;
   privateReason: string;
 }
@@ -40,7 +39,6 @@ const AddPage = () => {
   const [selectedFormData, setSelectedFormData] = useState<FormDate>({
     category: "",
     useType: "",
-    date: [],
     publicReason: "",
     privateReason: ""
   });
@@ -52,9 +50,7 @@ const AddPage = () => {
 
 
   useEffect(() => {
-    if (isSuccess) {
-      setTempRestRemainDay(myRest.restRemainDay);
-    }
+
   }, []);
 
 
@@ -77,12 +73,6 @@ const AddPage = () => {
 
   const handleSelectedDay = () => {
     const list = Object.keys(selectedDate);
-
-    if (list.length === 0) {
-      return <></>;
-    }
-
-
     let tempRemainDay = {
       takeoff: myRest!.restRemainDay['takeoff']!.remainDay,
       vacation: myRest!.restRemainDay['vacation']!.remainDay,
@@ -91,27 +81,63 @@ const AddPage = () => {
     const node: JSX.Element[] = [];
     list.forEach((date, index) => {
       const {category, useType} = selectedDate[date]!;
-      console.table(tempRemainDay);
-
-
       node.push(
-        <div key={index}>
+        <li key={index}>
           {translateType(category)} ({insertAtInString(date)}) : {translateType(useType)}
           {tempRemainDay[category]!} ➡️ {tempRemainDay[category]! - translateNumberType(useType)!}
-        </div>
+        </li>
       );
       tempRemainDay[category]! -= translateNumberType(useType)!;
-      console.table(tempRemainDay);
     });
     return node;
   };
 
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
-    console.log(selectedFormData);
-    // 날짜 : 정보 형식으로 firebase 올리기
+
+
+    // const myRestList: MyRestListType = {};
+    // Object.keys(selectedDate).forEach((value) => {
+    //   const temp = selectedDate[value as keyof SelectedDateTypes]!;
+    //   const data = {
+    //     "category": temp.category,
+    //     "createDt": "",
+    //     "date": insertAtInString(value),
+    //     "deduction": temp.deduction,
+    //     "privateReason": selectedFormData.privateReason,
+    //     "publicReason": selectedFormData.publicReason,
+    //     "useType": temp.useType,
+    //   };
+    //
+    //   if (Object.keys(myRest!.myRestList).includes(value)) {
+    //     const target = [...myRest!.myRestList[value]!, data];
+    //     myRestList[value] = target;
+    //   } else {
+    //     myRestList[value] = [data];
+    //   }
+    //   console.log(myRestList);
+    // });
+    // await writeMyRest(myRestList);
+
   };
+
+  const checkDisabled = () => {
+    console.log(selectedFormData);
+    const validation = Object.keys(selectedFormData).filter(key => {
+      const temp = selectedFormData[key as keyof FormDate]!;
+      if (key === "privateReason") {
+        return false;
+      }
+      return temp === "";
+    });
+    if (validation.length > 0 || Object.keys(selectedDate).length === 0) {
+      return true;
+    }
+    return false;
+  };
+
   return (
 
     <form onSubmit={onSubmit} className="add-page">
@@ -163,10 +189,14 @@ const AddPage = () => {
                           setSelectedDate={setSelectedDate}
                           handleSelectedDay={handleSelectedDay}/>
           </div>
-          <div className="col-span-6 sm:col-span-3 border">
-            {/* 일정 선택 결과 보여주기 */}
-            {handleSelectedDay()}
-          </div>
+          {Object.keys(selectedDate).length !== 0 &&
+            <ul
+              className="col-span-6 sm:col-span-3 border mt-2 rounded-md border border-gray-300
+              shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+              {/* 일정 선택 결과 보여주기 */}
+              {handleSelectedDay()}
+            </ul>
+          }
           <div className="col-span-6 sm:col-span-3">
             <label htmlFor="publicReason" className="block text-sm font-medium text-gray-700">
               휴가 사유
@@ -201,12 +231,7 @@ const AddPage = () => {
           </div>
         </div>
         <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
-          <button
-            type="submit"
-            className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Save
-          </button>
+          <Button type="submit" disabled={checkDisabled()}>Save</Button>
         </div>
       </div>
     </form>

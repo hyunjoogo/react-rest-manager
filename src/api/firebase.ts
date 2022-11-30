@@ -1,8 +1,8 @@
 import {initializeApp} from "firebase/app";
 import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from "firebase/auth";
-import {get, getDatabase, ref} from "firebase/database";
+import {get, getDatabase, ref, set, push, update, child} from "firebase/database";
 import {User} from "@firebase/auth";
-import {MyRestType} from "../components/type/type";
+import {MyRestListType, MyRestType} from "../components/type/type";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -51,7 +51,7 @@ const adminUser = async (user: User | null) => {
     });
 };
 
-export const getMyRest = async ()=> {
+export const getMyRest = async () => {
   const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
@@ -60,5 +60,48 @@ export const getMyRest = async ()=> {
       }
       return [];
     });
+};
+
+export const writeMyRest = async (data: MyRestListType) => {
+  const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
+
+  // 기존데이터가 있는지 없는지 확인해야해
+  console.log(data);
+
+  const postData = {
+    "20221108": [
+      {
+        "category": "takeoff",
+        "createDt" : "",
+        "date" : "2002-11-08",
+        "deduction": 1,
+        "privateReason" : "개인메모2",
+        "publicReaston" : "공적내용",
+        "useType": "tmo",
+      },
+    ],
+    "20221109": [
+      {
+        "category": "takeoff",
+        "createDt" : "",
+        "date" : "2002-11-09",
+        "deduction": 1,
+        "privateReason" : "개인메모",
+        "publicReaston" : "공적내용",
+        "useType": "tmo",
+      },
+    ]
+  }
+
+  const updates = {};
+  // @ts-ignore
+  updates[`user/${userUid}/myRestList`] = data;
+
+
+  return update(ref(database, `user/${userUid}/myRestList`), data);
+
+  // return update(ref(database, `users/${userUid}`), {
+  //   user: "test"
+  // });
 };
 

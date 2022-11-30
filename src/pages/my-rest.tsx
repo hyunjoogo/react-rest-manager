@@ -10,7 +10,6 @@ const MyRest = () => {
   const [addMode, setAddMode] = useState(false);
   const {isLoading, data: myRest} = useQuery(
     ['myRest'], getMyRest,
-    {staleTime: 1000 * 60 * 5}
   );
 
 

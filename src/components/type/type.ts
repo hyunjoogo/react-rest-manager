@@ -18,13 +18,15 @@ export interface DialogProps {
 
 
 export type MyRestType = {
-  myRestList: {
-    [key: string]: RestType[]
-  },
+  myRestList: MyRestListType,
   restRemainDay: {
     [key: string]: {
       [key: string]: number;
     };
   },
   uid: string;
+}
+
+export type MyRestListType = {
+  [key: string]: RestType[]
 }
