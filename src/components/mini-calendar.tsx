@@ -21,13 +21,12 @@ type SelectsDate = {
 }
 
 
-
 type MiniCalendarProps = {
   selectedFormData: FormDate;
   setSelectedFormData: React.Dispatch<React.SetStateAction<FormDate>>;
   handleSelectedDay: (newSelectsDate: string[]) => void;
-  selectedDate : SelectedDateTypes;
-  setSelectedDate : React.Dispatch<React.SetStateAction<SelectedDateTypes>>;
+  selectedDate: SelectedDateTypes;
+  setSelectedDate: React.Dispatch<React.SetStateAction<SelectedDateTypes>>;
 
 }
 
@@ -86,7 +85,7 @@ const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCal
       return alert('휴가 유형 또는 휴가 사용 유형을 선택하세요');
     }
 
-    // 1. 해당날짜가 이미 선택되어 있는지 없는지 확인
+    // 1. 이미 선택되어 있었다면?
     if (Object.keys(selectedDate).includes(targetDate)) {
       // 이미 눌러진 리스트에서 해당 날짜의 정보를 가지고 와서 다시 되돌리기
       const {category, deduction} = selectedDate[targetDate]!;
@@ -106,7 +105,7 @@ const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCal
         return temp;
       });
     } else {
-      // 1. 계산부터
+      // 2. 처음 누른거라면?
       // - 휴가 유형, 사용 유형 확인
       // - 0보다 작은 큰지 확인하여 return t/f
 
@@ -115,6 +114,28 @@ const MiniCalendar = ({selectedFormData, selectedDate, setSelectedDate}: MiniCal
 
       if (remainDay! - translateNumberType(useType)! < 0) {
         return alert('해당 휴가 유형의 사용일수가 부족합니다.');
+      }
+
+      // 해당날짜에 같은유형, 같은사용유형의 휴가가 있다면 에러
+      // console.log('해당 날짜의 값', myRest!.myRestList[value])
+      const valueOfThatDate = myRest!.myRestList[targetDate] === undefined ? [] : myRest!.myRestList[targetDate]!
+      console.log(valueOfThatDate)
+      let errorMessage = "";
+
+
+      const checkError = valueOfThatDate.filter(value => {
+        if (value.useType === useType) {
+          errorMessage = "같은 사용 유형을 사용할 수 없습니다."
+          return true
+        }
+        if (value.deduction + translateNumberType(useType)! > 1) {
+          errorMessage = "휴가의 합이 하루를 넘길 수 없습니다. "
+          return true
+        }
+      })
+      console.log(checkError)
+      if (checkError.length > 0) {
+        return alert(errorMessage)
       }
 
       setTempRestRemainDay(prev => {

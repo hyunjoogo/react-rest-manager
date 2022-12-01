@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
-import {DataType, MyRestListType, MyRestType} from "../components/type/type";
+import {CategoryType, DataType, MyRestListType, MyRestType} from "../components/type/type";
 import {translateNumberType, translateType} from "../utils/translateType";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {insertAtInString} from "../utils/changeDate";
-import {sortMyRest, writeMyRest} from "../api/firebase";
+import {getMyRest, sortMyRest, writeMyRest} from "../api/firebase";
 import Button from '../components/ui/Button';
+import {queryClient} from "../App";
 
 
 export type FormDate = {
@@ -19,12 +20,7 @@ export type FormDate = {
 export type DateType = Date | null
 
 type AddPageProps = {
-  myRest: MyRestType
-}
-
-type SelectedResultType = {
-  [key: string]: DataType
-}
+  setAddMode: React.Dispatch<React.SetStateAction<boolean>>;}
 
 export type SelectedDateTypes = {
   [key: string]: {
@@ -34,7 +30,8 @@ export type SelectedDateTypes = {
   }
 }
 
-const AddPage = () => {
+
+const AddPage = ({setAddMode}: AddPageProps) => {
 // 현재 폼에 선택되어 있는 데이터 모음
   const [selectedFormData, setSelectedFormData] = useState<FormDate>({
     category: "",
@@ -44,24 +41,25 @@ const AddPage = () => {
   });
   // 서버에서 가지고 온 잔여일 데이터
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
-  const [tempRestRemainDay, setTempRestRemainDay] = useState<MyRestType['restRemainDay']>({});
-  const [selectedResult, setSelectedResult] = useState<SelectedResultType[]>([]);   // 서버에 올릴 리스트
+  const mutation = useMutation(getMyRest, {
+    onError: () => {
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['myRest']});
+    },
+  });
+
   const [selectedDate, setSelectedDate] = useState<SelectedDateTypes>({});
-
-
-  useEffect(() => {
-
-  }, []);
-
 
   const handleSelectMenuValue = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
     const name = target.name;
-    const value = target.value as "takeoff" | "vacation" | "replace" | "";
     if (name === "category") {
-      setSelectedFormData(prev => ({...prev, [name]: value, useType: ""}));
+      const value = target.value as CategoryType;
+      setSelectedFormData(prev => ({...prev, "category": value, useType: ""}));
     } else {
-      setSelectedFormData(prev => ({...prev, [name]: target.value}));
+      const value = target.value;
+      setSelectedFormData(prev => ({...prev, [name]: value}));
     }
   };
 
@@ -95,6 +93,17 @@ const AddPage = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validation = Object.keys(selectedFormData).filter(key => {
+      const temp = selectedFormData[key as keyof FormDate]!;
+      if (key === "privateReason") {
+        return false;
+      }
+      return temp === "";
+    });
+    if (!validation) {
+      return;
+    }
+
     const myRestList: MyRestListType = {};
     Object.keys(selectedDate).forEach((value) => {
       const temp = selectedDate[value as keyof SelectedDateTypes]!;
@@ -107,20 +116,17 @@ const AddPage = () => {
         "publicReason": selectedFormData.publicReason,
         "useType": temp.useType,
       };
-
       if (Object.keys(myRest!.myRestList).includes(value)) {
         const target = [...myRest!.myRestList[value]!, data];
         myRestList[value] = target;
       } else {
         myRestList[value] = [data];
       }
-
     });
     await writeMyRest(myRestList);
     await sortMyRest(selectedDate);
-
-
-// TODO 새로 리패치 시킬 것
+    await mutation.mutate();
+    setAddMode(false);
   };
 
   const checkDisabled = () => {
@@ -231,6 +237,7 @@ const AddPage = () => {
         </div>
         <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
           <Button type="submit" disabled={checkDisabled()}>Save</Button>
+          <Button type="submit">Save</Button>
         </div>
       </div>
     </form>

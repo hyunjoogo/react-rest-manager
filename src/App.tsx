@@ -6,7 +6,7 @@ import {Outlet} from 'react-router-dom';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import DialogManager from './dialog/DialogManager';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
 
 });
 
