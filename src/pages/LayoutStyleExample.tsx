@@ -5,6 +5,7 @@ import {onUserStateChange} from "../api/firebase";
 import {User} from "@firebase/auth";
 import {Link} from 'react-router-dom';
 import MyRest from "./my-rest";
+import MyInfo from "./my-info";
 
 // https://tailwindui.com/components/application-ui/application-shells/stacked
 
@@ -16,7 +17,8 @@ const navigation = [
   {name: 'Reports', href: '#', current: false},
 ];
 const userNavigation = [
-  {name: 'Sign out', href: '#'},
+  {name: '내 정보', href: '/my-info'},
+  {name: '로그아웃', href: '#'},
 ];
 
 function classNames(class1: string, class2: string) {
@@ -177,7 +179,8 @@ const LayoutStyleExample = () => {
             {/* Replace with your content */}
             <div className="px-4 py-6 sm:px-0">
               {/*<div className="h-96 rounded-lg border-4 border-dashed border-gray-200"/>*/}
-              <MyRest/>
+              {/*<MyRest/>*/}
+              <MyInfo/>
             </div>
             {/* /End replace */}
           </div>

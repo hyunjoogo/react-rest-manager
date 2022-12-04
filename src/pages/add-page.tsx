@@ -237,7 +237,6 @@ const AddPage = ({setAddMode}: AddPageProps) => {
         </div>
         <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
           <Button type="submit" disabled={checkDisabled()}>Save</Button>
-          <Button type="submit">Save</Button>
         </div>
       </div>
     </form>
