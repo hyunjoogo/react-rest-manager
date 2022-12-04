@@ -1,11 +1,9 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, ReactNode, useEffect, useState} from 'react';
 import {Disclosure, Menu, Transition} from '@headlessui/react';
 import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline';
 import {onUserStateChange} from "../api/firebase";
 import {User} from "@firebase/auth";
 import {Link} from 'react-router-dom';
-import MyRest from "./my-rest";
-import MyInfo from "./my-info";
 
 // https://tailwindui.com/components/application-ui/application-shells/stacked
 
@@ -29,7 +27,11 @@ interface UserState extends User {
   isAdmin?: boolean;
 }
 
-const LayoutStyleExample = () => {
+type LayoutStyleProps = {
+  children : ReactNode
+}
+
+const LayoutStyle = ({children}:LayoutStyleProps) => {
   const [userState, setUserState] = useState<UserState | null>(null);
 
   useEffect(() => {
@@ -178,9 +180,7 @@ const LayoutStyleExample = () => {
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             {/* Replace with your content */}
             <div className="px-4 py-6 sm:px-0">
-              {/*<div className="h-96 rounded-lg border-4 border-dashed border-gray-200"/>*/}
-              <MyRest/>
-              {/*<MyInfo/>*/}
+              {children}
             </div>
             {/* /End replace */}
           </div>
@@ -190,4 +190,4 @@ const LayoutStyleExample = () => {
   );
 };
 
-export default LayoutStyleExample;
+export default LayoutStyle;

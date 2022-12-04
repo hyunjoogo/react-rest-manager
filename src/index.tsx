@@ -6,7 +6,8 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import NotFound from "./pages/NotFound";
 import MyRest from "./pages/my-rest";
 import ProtectedRoute from './pages/ProtectedRoute';
-import LayoutStyleExample from "./pages/LayoutStyleExample";
+import LayoutStyle from "./pages/LayoutStyle";
+import MyInfo from "./pages/my-info";
 
 const router = createBrowserRouter([
   {
@@ -14,14 +15,14 @@ const router = createBrowserRouter([
     element: <App/>,
     errorElement: <NotFound/>,
     children: [
-      {index: true, path: '/', element: <LayoutStyleExample/>},
-      {index: true, path: '/my-info', element: <LayoutStyleExample/>},
+      {index: true, path: '/', element: <LayoutStyle> <MyRest/></LayoutStyle>},
+      {index: true, path: '/my-info', element: <LayoutStyle> <MyInfo/></LayoutStyle>},
       {path: '/products', element: <NotFound/>},
       {
         path: '/products/new',
         element: (
           <ProtectedRoute requireAdmin>
-            <MyRest />
+            <MyRest/>
           </ProtectedRoute>
         ),
       },
