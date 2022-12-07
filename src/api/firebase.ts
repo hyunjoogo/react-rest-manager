@@ -29,6 +29,7 @@ export function logout() {
 }
 
 
+
 export const onUserStateChange = (callback: any) => {
   onAuthStateChanged(auth, async (user) => {
     const updatedUser: any = user ? await adminUser(user) : null;
@@ -54,9 +55,9 @@ const adminUser = async (user: User | null) => {
 };
 
 
-export const getMyRest = async () => {
+export const getMyRest = async (userUid : string) => {
   // TODO userUid 파라미터로 받아오기
-  const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
+  // const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
       if (snapshot.exists()) {

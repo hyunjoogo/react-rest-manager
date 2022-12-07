@@ -1,15 +1,22 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import Calendar from "../components/Calendar";
 import AddPage from './add-page';
 import {useQuery} from "@tanstack/react-query";
 import {getMyRest} from "../api/firebase";
 import MyRestRemainDay from "../components/MyRestRemainDay";
 import Button from '../components/ui/Button';
+import {useAuthContext} from "../components/context/AuthContext";
 
 const MyRest = () => {
   const [addMode, setAddMode] = useState(false);
+  const store = useAuthContext()
   const {isLoading, data: myRest} = useQuery(
-    ['myRest'], getMyRest,
+    ['myRest'], () => {
+      if (!store?.user) {
+        console.log(store)
+      return getMyRest("61PnszykzXN643UrVfEaSQCDiEw1")
+      }
+    },
   );
 
 
@@ -24,6 +31,7 @@ const MyRest = () => {
   function classNames(class1: string, class2: string) {
     return [class1, class2].filter(Boolean).join(' ');
   }
+
   return (
     <>
       <div className="myRest-title">

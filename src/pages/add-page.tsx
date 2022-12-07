@@ -20,7 +20,8 @@ export type FormDate = {
 export type DateType = Date | null
 
 type AddPageProps = {
-  setAddMode: React.Dispatch<React.SetStateAction<boolean>>;}
+  setAddMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 export type SelectedDateTypes = {
   [key: string]: {
@@ -41,7 +42,7 @@ const AddPage = ({setAddMode}: AddPageProps) => {
   });
   // 서버에서 가지고 온 잔여일 데이터
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
-  const mutation = useMutation(getMyRest, {
+  const mutation = useMutation(() => getMyRest('61PnszykzXN643UrVfEaSQCDiEw1'), {
     onError: () => {
     },
     onSuccess: () => {

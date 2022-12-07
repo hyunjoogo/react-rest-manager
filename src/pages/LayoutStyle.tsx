@@ -1,9 +1,10 @@
-import {Fragment, ReactNode, useEffect, useState} from 'react';
+import React, {Fragment, ReactNode, useEffect, useState} from 'react';
 import {Disclosure, Menu, Transition} from '@headlessui/react';
 import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline';
-import {onUserStateChange} from "../api/firebase";
+import {login, logout, onUserStateChange} from "../api/firebase";
 import {User} from "@firebase/auth";
 import {Link} from 'react-router-dom';
+import Button from "../components/ui/Button";
 
 // https://tailwindui.com/components/application-ui/application-shells/stacked
 
@@ -16,7 +17,8 @@ const navigation = [
 ];
 const userNavigation = [
   {name: '내 정보', href: '/my-info'},
-  {name: '로그아웃', href: '#'},
+  {name: '로그아웃', href: '#', onClick: () => logout()},
+  {name: '로그인', href: '#', onClick: () => login()},
 ];
 
 function classNames(class1: string, class2: string) {
@@ -28,10 +30,10 @@ interface UserState extends User {
 }
 
 type LayoutStyleProps = {
-  children : ReactNode
+  children: ReactNode
 }
 
-const LayoutStyle = ({children}:LayoutStyleProps) => {
+const LayoutStyle = ({children}: LayoutStyleProps) => {
   const [userState, setUserState] = useState<UserState | null>(null);
 
   useEffect(() => {
@@ -102,6 +104,8 @@ const LayoutStyle = ({children}:LayoutStyleProps) => {
                                 {({active}) => (
                                   <Link
                                     to={item.href}
+                                    onClick={item?.onClick}
+
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
                                       'block px-4 py-2 text-sm text-gray-700'
@@ -165,6 +169,7 @@ const LayoutStyle = ({children}:LayoutStyleProps) => {
                         key={item.name}
                         as="a"
                         href={item.href}
+                        onClick={item?.onClick}
                         className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                       >
                         {item.name}
