@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import MiniCalendar from "../components/mini-calendar";
 import {CategoryType, DataType, MyRestListType, MyRestType} from "../components/type/type";
@@ -8,6 +8,8 @@ import {insertAtInString} from "../utils/changeDate";
 import {getMyRest, sortMyRest, writeMyRest} from "../api/firebase";
 import Button from '../components/ui/Button';
 import {queryClient} from "../App";
+import {Store, useAuthContext} from "../components/context/AuthContext";
+import {UserState} from "../components/ui/navbar";
 
 
 export type FormDate = {
@@ -41,8 +43,9 @@ const AddPage = ({setAddMode}: AddPageProps) => {
     privateReason: ""
   });
   // 서버에서 가지고 온 잔여일 데이터
+  const store = useAuthContext()
   const {isSuccess, data: myRest} = useQuery<MyRestType>(['myRest']);
-  const mutation = useMutation(() => getMyRest('61PnszykzXN643UrVfEaSQCDiEw1'), {
+  const mutation = useMutation(() => getMyRest(store?.user?.uid), {
     onError: () => {
     },
     onSuccess: () => {

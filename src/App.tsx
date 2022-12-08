@@ -7,7 +7,11 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import DialogManager from './dialog/DialogManager';
 
 export const queryClient = new QueryClient({
-
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  }
 });
 
 function App() {

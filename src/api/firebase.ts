@@ -55,9 +55,11 @@ const adminUser = async (user: User | null) => {
 };
 
 
-export const getMyRest = async (userUid : string) => {
+export const getMyRest = async (userUid : string | undefined) => {
   // TODO userUid 파라미터로 받아오기
-  // const userUid = "61PnszykzXN643UrVfEaSQCDiEw1";
+  if (typeof userUid === "undefined") {
+    return Promise.reject(new Error('로그인을 해주세요!'));
+  }
   return get(ref(database, `user/${userUid}`))
     .then((snapshot) => {
       if (snapshot.exists()) {

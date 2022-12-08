@@ -1,7 +1,7 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import {User} from "firebase/auth";
 import {login, logout, onUserStateChange} from "../../api/firebase";
-import { UserState } from '../ui/navbar';
+import {UserState} from '../ui/navbar';
 
 export type Store = {
   user: UserState | null;
@@ -25,9 +25,7 @@ export function AuthContextProvider({children}: AuthContextProviderProps) {
     });
   }, []);
 
-  const store: Store = {
-    user, login, logout, setUser
-  };
+  const store: Store = {user, login, logout, setUser};
 
   return (
     <AuthContext.Provider value={store}>

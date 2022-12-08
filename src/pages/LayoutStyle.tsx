@@ -10,7 +10,7 @@ import Button from "../components/ui/Button";
 
 const navigation = [
   {name: '나의 휴가', href: '/', current: true},
-  {name: '휴가 추가하기', href: '#', current: false},
+  {name: '휴가 관리', href: '/rest-mgmt', current: false},
   {name: 'Projects', href: '#', current: false},
   {name: 'Calendar', href: '#', current: false},
   {name: 'Reports', href: '#', current: false},

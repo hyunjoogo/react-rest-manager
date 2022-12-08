@@ -1,16 +1,17 @@
 import React from 'react';
 import {translateType} from "../utils/translateType";
+
 type WillUseRest = {
-  data : {
+  data: {
     category: "takeoff" | "vacation" | "replace",
     useType: "tmo" | "tao" | "tdo",
     deduction: number,
   };
-  date : string;
+  date: string;
 }
-const WillUseRest = ({} : WillUseRest) => {
+const WillUseRest = ({}: WillUseRest) => {
   return (
-<></>
+    <></>
   );
 };
 

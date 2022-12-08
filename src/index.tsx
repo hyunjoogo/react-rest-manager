@@ -8,6 +8,7 @@ import MyRest from "./pages/my-rest";
 import ProtectedRoute from './pages/ProtectedRoute';
 import LayoutStyle from "./pages/LayoutStyle";
 import MyInfo from "./pages/my-info";
+import RestList from "./pages/rest-mgmt/restList";
 
 const router = createBrowserRouter([
   {
@@ -15,8 +16,9 @@ const router = createBrowserRouter([
     element: <App/>,
     errorElement: <NotFound/>,
     children: [
-      {index: true, path: '/', element: <LayoutStyle> <MyRest/></LayoutStyle>},
-      {index: true, path: '/my-info', element: <LayoutStyle> <MyInfo/></LayoutStyle>},
+      {index: true, path: '/', element: <LayoutStyle><MyRest/></LayoutStyle>},
+      {index: true, path: '/my-info', element: <LayoutStyle><MyInfo/></LayoutStyle>},
+      {index: true, path: '/rest-mgmt', element: <LayoutStyle><RestList/></LayoutStyle>},
       {path: '/products', element: <NotFound/>},
       {
         path: '/products/new',

@@ -9,16 +9,15 @@ import {useAuthContext} from "../components/context/AuthContext";
 
 const MyRest = () => {
   const [addMode, setAddMode] = useState(false);
-  const store = useAuthContext()
-  const {isLoading, data: myRest} = useQuery(
-    ['myRest'], () => {
-      if (!store?.user) {
-        console.log(store)
-      return getMyRest("61PnszykzXN643UrVfEaSQCDiEw1")
-      }
-    },
-  );
-
+  const store = useAuthContext();
+  const getRest = async () => {
+    return await getMyRest(store?.user?.uid)
+  }
+  const {isLoading, data: myRest} = useQuery({
+    queryKey: ['myRest'],
+    queryFn: getRest,
+    onError: (err) => console.log(err),
+  });
 
   const handleAddMode = useCallback(() => {
     setAddMode(prev => !prev);
